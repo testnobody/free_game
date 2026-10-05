@@ -6,7 +6,7 @@
  * game links, so a game opened from the landing page always matches it.
  *
  * Usage in a game (before game.js):
- *   <script src="../assets/i18n.js"></script>
+ *   <script src="../../assets/i18n.js"></script>
  *   <script>window.GAME_STR = { zh: {...}, en: {...} };</script>
  *
  * Then in game.js:  AMG.t(GAME_STR, "key")  or  AMG.tf(GAME_STR, "key", arg)

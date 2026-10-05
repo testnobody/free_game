@@ -1,6 +1,6 @@
 /* Minimal bilingual helper shared by every game in this repo.
  * Usage:
- *   <script src="../assets/i18n.js"></script>
+ *   <script src="../../assets/i18n.js"></script>
  *   var T = LiteI18N.create({ key: { en: '...', zh: '...' } });
  *   T.start();                       // mounts the switcher and applies the language
  *   T.t('key');                      // translate in JS

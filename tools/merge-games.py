@@ -39,6 +39,8 @@ AMG_SHARED = ["i18n.js", "theme.js", "touch.js", "ui.css"]
 TEXT_SUFFIXES = {".html", ".js", ".css"}
 
 LITE_I18N_RE = re.compile(r"\.\./assets/i18n\.js")
+# 游戏目录位于 www/games/<id>/（比上游仓库深一级），共享资源在 www/assets/，
+# 因此相对引用需要两级 ../（上游仓库中只需一级）
 AMG_ASSETS_RE = re.compile(r"((?:\.\./)+)assets/")
 # 离线 App 用 file:///android_asset 加载：query string (?v=...) 在某些
 # WebView/AssetManager 组合下会导致子资源 404，且离线场景无缓存意义，直接去掉
@@ -47,14 +49,14 @@ CACHEBUST_RE = re.compile(r"\?v=\d+")
 
 def rewrite_lite(path: Path) -> None:
     text = path.read_text(encoding="utf-8")
-    new = LITE_I18N_RE.sub("../assets/i18n-lite.js", text)
+    new = LITE_I18N_RE.sub("../../assets/i18n-lite.js", text)
     if new != text:
         path.write_text(new, encoding="utf-8")
 
 
 def rewrite_amg(path: Path) -> None:
     text = path.read_text(encoding="utf-8")
-    new = AMG_ASSETS_RE.sub(lambda m: m.group(1) + "assets/amg/", text)
+    new = AMG_ASSETS_RE.sub(lambda m: "../" + m.group(1) + "assets/amg/", text)
     new = CACHEBUST_RE.sub("", new)
     if new != text:
         path.write_text(new, encoding="utf-8")
