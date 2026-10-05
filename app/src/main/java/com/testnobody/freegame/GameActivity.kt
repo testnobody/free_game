@@ -25,6 +25,11 @@ class GameActivity : AppCompatActivity() {
             javaScriptEnabled = true
             domStorageEnabled = true // localStorage 存最高分/进度
             allowFileAccess = true   // 加载 file:///android_asset 与外部 overlay 目录
+            // 关键：file:// 页面默认不允许再加载其他 file:// 子资源（JS/CSS），
+            // 会导致游戏脚本静默加载失败、页面只有静态 HTML。离线单机应用、
+            // 无 INTERNET 权限，只加载自带 assets，无安全风险。
+            allowFileAccessFromFileURLs = true
+            allowUniversalAccessFromFileURLs = true
             mediaPlaybackRequiresUserGesture = false
             builtInZoomControls = false
             displayZoomControls = false
