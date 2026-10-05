@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="description" content="瞄准发射，三个同色泡泡连在一起就消除！">
+<link rel="canonical" href="https://awesome-mini-game.vercel.app/bubble-dragon/">
+<link rel="alternate" hreflang="zh-CN" href="https://awesome-mini-game.vercel.app/bubble-dragon/">
+<link rel="alternate" hreflang="en" href="https://awesome-mini-game.vercel.app/bubble-dragon/?lang=en">
+<link rel="alternate" hreflang="ja" href="https://awesome-mini-game.vercel.app/bubble-dragon/?lang=ja">
+<link rel="alternate" hreflang="ko" href="https://awesome-mini-game.vercel.app/bubble-dragon/?lang=ko">
+<link rel="alternate" hreflang="x-default" href="https://awesome-mini-game.vercel.app/bubble-dragon/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Awesome Mini Game">
+<meta property="og:title" content="泡泡龙 · 经典益智">
+<meta property="og:description" content="瞄准发射，三个同色泡泡连在一起就消除！">
+<meta property="og:url" content="https://awesome-mini-game.vercel.app/bubble-dragon/">
+<meta property="og:image" content="https://awesome-mini-game.vercel.app/assets/og-cover.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="泡泡龙 · 经典益智">
+<meta name="twitter:description" content="瞄准发射，三个同色泡泡连在一起就消除！">
+<meta name="twitter:image" content="https://awesome-mini-game.vercel.app/assets/og-cover.png">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "VideoGame",
+  "name": "泡泡龙 · 经典益智",
+  "description": "瞄准发射，三个同色泡泡连在一起就消除！",
+  "url": "https://awesome-mini-game.vercel.app/bubble-dragon/",
+  "genre": "益智解谜",
+  "gamePlatform": "Web Browser",
+  "inLanguage": [
+    "zh-CN",
+    "en",
+    "ja",
+    "ko"
+  ],
+  "isAccessibleForFree": true,
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "CNY"
+  }
+}
+</script>
+<link rel="icon" href="/favicon.svg" />
+<title>泡泡龙 · 经典益智</title>
+<link rel="stylesheet" href="styles.css" />
+<link rel="stylesheet" href="../assets/amg/ui.css?v=20260915" />
+<script src="../assets/amg/theme.js"></script>
+</head>
+<body>
+<div class="bg-orbs"><span></span><span></span><span></span></div>
+<main class="page">
+  <header class="brand">
+    <div class="logo">🫧</div>
+    <div>
+      <h1><span data-i18n="name">泡泡龙</span> <em data-i18n="subtitle">经典益智</em></h1>
+      <p data-i18n="intro">瞄准发射，三个同色泡泡连在一起就消除！</p>
+    </div>
+    <div class="brand-btns">
+      <button id="btn-mute" class="icon-btn" title="声音开 / 关 (M)">🔊</button>
+    </div>
+  </header>
+  <section class="cabinet">
+    <div class="game-frame">
+      <canvas id="game" width="480" height="640"></canvas>
+      <div id="screen-menu" class="screen">
+        <div class="title-badge">BUBBLE</div>
+        <h2 class="game-title" data-i18n="name">泡泡龙</h2>
+        <div class="hero-row"><span class="hero">🔴</span><span class="hero f">🟡</span><span class="hero">🔵</span><span class="hero f">🟢</span></div>
+        <button id="btn-start" class="btn primary" data-i18n="start">🚀 开始游戏</button>
+        <p class="hint"><span data-i18n="aimPre">鼠标</span> / <kbd>←</kbd><kbd>→</kbd> <span data-i18n="aimKw">瞄准</span> · <span data-i18n="firePre">点击</span> / <kbd data-i18n="kbdSpace">空格</kbd> <span data-i18n="fireKw">发射</span> · <kbd>P</kbd> <span data-i18n="pauseKw">暂停</span></p>
+        <div id="menu-best" class="mini-board">🏆 历史最高：0</div>
+      </div>
+      <div id="screen-pause" class="screen dim hidden">
+        <div class="panel"><h3 data-i18n="pausedTitle">⏸ 已暂停</h3><p data-i18n="resumeHint">按 P 继续</p>
+          <div class="row"><button id="btn-resume" class="btn primary" data-i18n="resume">继续</button><button id="btn-quit" class="btn ghost" data-i18n="quit">回菜单</button></div>
+        </div>
+      </div>
+      <div id="screen-over" class="screen dim hidden">
+        <div class="panel pop">
+          <h3 id="over-title" class="over-title">GAME OVER</h3>
+          <div class="score-row">
+            <div><label data-i18n="score">得分</label><b id="final-score">0</b></div>
+            <div class="divider"></div>
+            <div><label data-i18n="stageReached">到达关卡</label><b id="final-stage">1</b></div>
+          </div>
+          <div class="row"><button id="btn-retry" class="btn primary" data-i18n="retry">🔄 再来一局 (R)</button><button id="btn-menu" class="btn ghost" data-i18n="menu">菜单</button></div>
+        </div>
+      </div>
+      <div id="screen-clear" class="screen dim hidden">
+        <div class="panel pop">
+          <h3 class="clear-title"><span data-i18n="clearPre">🎉 第</span> <span id="clear-lv">1</span> <span data-i18n="clearSuf">关通过！</span></h3>
+          <div id="clear-stats" class="stat-list"></div>
+          <div class="row"><button id="btn-next" class="btn primary" data-i18n="next">下一关 →</button><button id="btn-menu2" class="btn ghost" data-i18n="menu">菜单</button></div>
+        </div>
+      </div>
+    </div>
+    <aside class="side">
+      <div class="card"><h4 data-i18n="opTitle">🎮 操作</h4><ul>
+        <li data-i18n="op1">鼠标移动瞄准，点击发射</li><li><kbd>←</kbd><kbd>→</kbd> <span data-i18n="fineTune">微调</span> · <kbd data-i18n="kbdSpace">空格</kbd> <span data-i18n="fireKw">发射</span></li><li><kbd>P</kbd> <span data-i18n="pauseKw">暂停</span> · <kbd>M</kbd> <span data-i18n="muteKw">静音</span> · <kbd>R</kbd> <span data-i18n="restartKw">重开</span></li></ul></div>
+      <div class="card"><h4 data-i18n="ruleTitle">🫧 消除规则</h4><ul class="medals">
+        <li data-i18n="rule1">🎯 相同色 3 连即消除</li><li data-i18n="rule2">🧊 孤块失去连接会掉落，额外加分</li><li data-i18n="rule3">⬇️ 发射数达上限，天花板下压一行</li><li data-i18n="rule4">💀 泡泡压过底线即失败</li></ul></div>
+      <div class="card diff"><h4 data-i18n="tipTitle">💡 高分诀窍</h4>
+        <p data-i18n="tipBody">瞄准根部的大团泡泡打！打断一根就掉一片，比一颗颗消划算多了。</p></div>
+    </aside>
+  </section>
+  <details class="card seo-about"><summary data-i18n="aboutTitle">📖 关于这款游戏</summary><p data-i18n="aboutBody">瞄准发射，三个同色泡泡连在一起就消除！ 浏览器打开即玩，支持键盘和触屏，无需下载安装，完全免费。</p></details>
+
+  <footer data-i18n="footer">🕹️ 打开即玩 · 完全免费 · 支持键盘和触屏</footer>
+</main>
+<script src="../assets/amg/i18n.js?v=20260915"></script>
+<script>
+window.GAME_STR = {
+  zh: {
+    title: '泡泡龙 · 经典益智', name: '泡泡龙', subtitle: '经典益智',
+    intro: '瞄准发射，三个同色泡泡连在一起就消除！',
+    start: '🚀 开始游戏',
+    aimPre: '鼠标', aimKw: '瞄准', firePre: '点击', fireKw: '发射', pauseKw: '暂停', kbdSpace: '空格',
+    pausedTitle: '⏸ 已暂停', resumeHint: '按 P 继续', resume: '继续', quit: '回菜单',
+    score: '得分', stageReached: '到达关卡',
+    retry: '🔄 再来一局 (R)', menu: '菜单', next: '下一关 →',
+    clearPre: '🎉 第', clearSuf: '关通过！',
+    opTitle: '🎮 操作', op1: '鼠标移动瞄准，点击发射', fineTune: '微调', muteKw: '静音', restartKw: '重开',
+    ruleTitle: '🫧 消除规则', rule1: '🎯 相同色 3 连即消除', rule2: '🧊 孤块失去连接会掉落，额外加分', rule3: '⬇️ 发射数达上限，天花板下压一行', rule4: '💀 泡泡压过底线即失败',
+    tipTitle: '💡 高分诀窍', tipBody: '瞄准根部的大团泡泡打！打断一根就掉一片，比一颗颗消划算多了。',
+    footer: '🕹️ 打开即玩 · 完全免费 · 支持键盘和触屏',
+    muteTitle: '声音开 / 关 (M)',
+    best: v => '🏆 历史最高：' + v,
+    nextLabel: '下个：',
+    clearStats: (b, s) => '<div>🎯 关卡奖励 <b>+' + b + '</b></div><div>⭐ 总分 <b>' + s + '</b></div>',
+    aboutTitle: '📖 关于这款游戏',
+    aboutBody: '瞄准发射，三个同色泡泡连在一起就消除！ 浏览器打开即玩，支持键盘和触屏，无需下载安装，完全免费。',
+  },
+  en: {
+    title: 'Bubble Shooter · Classic Puzzle', name: 'Bubble Shooter', subtitle: 'Classic Puzzle',
+    intro: 'Aim and shoot — pop 3 or more same-color bubbles!',
+    start: '🚀 Start Game',
+    aimPre: 'Mouse', aimKw: 'to aim', firePre: 'Click', fireKw: 'to shoot', pauseKw: 'to pause', kbdSpace: 'Space',
+    pausedTitle: '⏸ Paused', resumeHint: 'Press P to resume', resume: 'Resume', quit: 'Menu',
+    score: 'Score', stageReached: 'Stage reached',
+    retry: '🔄 Play Again (R)', menu: 'Menu', next: 'Next Stage →',
+    clearPre: '🎉 Stage', clearSuf: 'cleared!',
+    opTitle: '🎮 Controls', op1: 'Move the mouse to aim, click to shoot', fineTune: 'fine-tune', muteKw: 'mute', restartKw: 'restart',
+    ruleTitle: '🫧 Clear Rules', rule1: '🎯 3+ same color pops', rule2: '🧊 Orphaned bubbles drop for bonus points', rule3: '⬇️ The ceiling pushes down after enough shots', rule4: '💀 Game over if bubbles cross the bottom line',
+    tipTitle: '💡 Scoring Trick', tipBody: 'Aim for big clusters at the root! Cut one link and a whole chunk falls — far better than popping one by one.',
+    footer: '🕹️ Play instantly · Free · Keyboard & touch friendly',
+    muteTitle: 'Sound on/off (M)',
+    best: v => '🏆 Best: ' + v,
+    nextLabel: 'Next:',
+    clearStats: (b, s) => '<div>🎯 Stage bonus <b>+' + b + '</b></div><div>⭐ Total <b>' + s + '</b></div>',
+    aboutTitle: '📖 About this game',
+    aboutBody: 'Aim and shoot — pop 3 or more same-color bubbles! Play instantly in your browser — keyboard and touch supported, no download needed, completely free.',
+  },
+  ja: {
+    title: 'バブルシューティング · クラシックパズル', name: 'バブルシューティング', subtitle: 'クラシックパズル',
+    intro: '狙って撃とう！同じ色の泡を3つそろえると消えるよ',
+    start: '🚀 ゲームスタート',
+    aimPre: 'マウス', aimKw: 'で狙う', firePre: 'クリック', fireKw: 'で発射', pauseKw: 'で一時停止', kbdSpace: 'スペース',
+    pausedTitle: '⏸ 一時停止中', resumeHint: 'Pキーで再開', resume: '再開', quit: 'メニューへ',
+    score: 'スコア', stageReached: '到達ステージ',
+    retry: '🔄 もう一回 (R)', menu: 'メニュー', next: '次の面へ →',
+    clearPre: '🎉 ステージ', clearSuf: 'クリア！',
+    opTitle: '🎮 操作', op1: 'マウスで狙ってクリックで発射', fineTune: '微調整', muteKw: 'ミュート', restartKw: 'リスタート',
+    ruleTitle: '🫧 消去ルール', rule1: '🎯 同色3つで消去', rule2: '🧊 消去後に孤立したバブルは落下ボーナス', rule3: '⬇️ 規定発射数で天井が一段下降', rule4: '💀 バブルが底線を超えたら終了',
+    tipTitle: '💡 高得点のコツ', tipBody: '根元の大きなかたまりを狙おう！ひとつ切ればまとめて落下、ひと粒ずつ消すよりずっとお得。',
+    footer: '🕹️ すぐ遊べる · 完全無料 · キーボード＆タッチ対応',
+    muteTitle: 'サウンド ON/OFF (M)',
+    best: v => '🏆 最高記録：' + v,
+    nextLabel: '次：',
+    clearStats: (b, s) => '<div>🎯 ステージボーナス <b>+' + b + '</b></div><div>⭐ 合計 <b>' + s + '</b></div>',
+    aboutTitle: '📖 このゲームについて',
+    aboutBody: '狙って撃とう！同じ色の泡を3つそろえると消えるよ ブラウザでそのまま遊べます。キーボード・タッチ操作対応、ダウンロード不要・完全無料。',
+  },
+  ko: {
+    title: '버블슈팅 · 클래식 퍼즐', name: '버블슈팅', subtitle: '클래식 퍼즐',
+    intro: '조준해서 발사! 같은 색 거품 3개를 모으면 터져요',
+    start: '🚀 게임 시작',
+    aimPre: '마우스', aimKw: '로 조준', firePre: '클릭', fireKw: '으로 발사', pauseKw: '로 일시정지', kbdSpace: '스페이스',
+    pausedTitle: '⏸ 일시정지', resumeHint: 'P를 눌러 계속', resume: '계속', quit: '메뉴로',
+    score: '점수', stageReached: '도달 스테이지',
+    retry: '🔄 다시 하기 (R)', menu: '메뉴', next: '다음 스테이지 →',
+    clearPre: '🎉 스테이지', clearSuf: '클리어!',
+    opTitle: '🎮 조작', op1: '마우스로 조준하고 클릭해 발사', fineTune: '미세 조정', muteKw: '음소거', restartKw: '다시 시작',
+    ruleTitle: '🫧 제거 규칙', rule1: '🎯 같은 색 3개면 제거', rule2: '🧊 제거 후 연결 끊긴 버블은 낙하 보너스', rule3: '⬇️ 발사 수가 차면 천장이 한 줄 하강', rule4: '💀 버블이 바닥선을 넘으면 종료',
+    tipTitle: '💡 고득점 비결', tipBody: '뿌리 쪽 큰 덩어리를 노리세요! 한 연결만 끊어도 통째로 떨어져 한 알씩 지우는 것보다 훨씬 이득.',
+    footer: '🕹️ 바로 플레이 · 완전 무료 · 키보드 & 터치 지원',
+    muteTitle: '사운드 켜기/끄기 (M)',
+    best: v => '🏆 최고 기록: ' + v,
+    nextLabel: '다음:',
+    clearStats: (b, s) => '<div>🎯 스테이지 보너스 <b>+' + b + '</b></div><div>⭐ 총점 <b>' + s + '</b></div>',
+    aboutTitle: '📖 게임 소개',
+    aboutBody: '조준해서 발사! 같은 색 거품 3개를 모으면 터져요 브라우저에서 바로 플레이 — 키보드와 터치 지원, 다운로드 불필요, 완전 무료.',
+  }
+};
+</script>
+<script src="game.js?v=20260906"></script>
+</body>
+</html>

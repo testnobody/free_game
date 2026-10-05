@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">FreeGame</string>
+    <string name="about_title">关于 FreeGame</string>
+    <string name="about_text">FreeGame v1.0.0\n离线单机小游戏合集，共 35 款，全部内置、无需联网。\n\n游戏来源（MIT 开源）：\n• litegame（gtdong/litegame）© 2026 DongGuoTao\n• awesome-mini-game（davidzhanghui/awesome-mini-game）© 2026 davidzhanghui\n\n版权说明：\n游戏代码遵循 MIT 协议开源；游戏名称、玩法与设计归各自原版权方所有。本 App 为非商业性质的粉丝致敬 + 学习作品，请支持正版。\n\n本 App 源码同样遵循 MIT 协议开源。</string>
+    <string name="menu_about">关于</string>
+</resources>

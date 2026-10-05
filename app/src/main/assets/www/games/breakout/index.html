@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="description" content="移动挡板接住小球，打碎所有砖块！">
+<link rel="canonical" href="https://awesome-mini-game.vercel.app/breakout/">
+<link rel="alternate" hreflang="zh-CN" href="https://awesome-mini-game.vercel.app/breakout/">
+<link rel="alternate" hreflang="en" href="https://awesome-mini-game.vercel.app/breakout/?lang=en">
+<link rel="alternate" hreflang="ja" href="https://awesome-mini-game.vercel.app/breakout/?lang=ja">
+<link rel="alternate" hreflang="ko" href="https://awesome-mini-game.vercel.app/breakout/?lang=ko">
+<link rel="alternate" hreflang="x-default" href="https://awesome-mini-game.vercel.app/breakout/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Awesome Mini Game">
+<meta property="og:title" content="打砖块 · 经典益智">
+<meta property="og:description" content="移动挡板接住小球，打碎所有砖块！">
+<meta property="og:url" content="https://awesome-mini-game.vercel.app/breakout/">
+<meta property="og:image" content="https://awesome-mini-game.vercel.app/assets/og-cover.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="打砖块 · 经典益智">
+<meta name="twitter:description" content="移动挡板接住小球，打碎所有砖块！">
+<meta name="twitter:image" content="https://awesome-mini-game.vercel.app/assets/og-cover.png">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "VideoGame",
+  "name": "打砖块 · 经典益智",
+  "description": "移动挡板接住小球，打碎所有砖块！",
+  "url": "https://awesome-mini-game.vercel.app/breakout/",
+  "genre": "益智解谜",
+  "gamePlatform": "Web Browser",
+  "inLanguage": [
+    "zh-CN",
+    "en",
+    "ja",
+    "ko"
+  ],
+  "isAccessibleForFree": true,
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "CNY"
+  }
+}
+</script>
+<link rel="icon" href="/favicon.svg" />
+<title>打砖块 · 经典益智</title>
+<link rel="stylesheet" href="styles.css" />
+<link rel="stylesheet" href="../assets/amg/ui.css?v=20260915" />
+<script src="../assets/amg/theme.js"></script>
+</head>
+<body>
+<div class="bg-orbs"><span></span><span></span><span></span></div>
+<main class="page">
+  <header class="brand">
+    <div class="logo">🧱</div>
+    <div>
+      <h1><span data-i18n="gameTitle">打砖块</span> <em data-i18n="subtitle">经典益智</em></h1>
+      <p data-i18n="intro">移动挡板接住小球，打碎所有砖块！</p>
+    </div>
+    <div class="brand-btns">
+      <button id="btn-mute" class="icon-btn" title="声音开 / 关 (M)">🔊</button>
+    </div>
+  </header>
+  <section class="cabinet">
+    <div class="game-frame">
+      <canvas id="game" width="480" height="640"></canvas>
+      <div id="screen-menu" class="screen">
+        <div class="title-badge">BREAKOUT</div>
+        <h2 class="game-title" data-i18n="gameTitle">打砖块</h2>
+        <div class="hero-row"><span class="hero">🧱</span><span class="hero f">⚾</span><span class="hero">🎾</span></div>
+        <button id="btn-start" class="btn primary" data-i18n="start">🚀 开始游戏</button>
+        <p class="hint"><span data-i18n="hintA">鼠标 /</span> <kbd>←</kbd><kbd>→</kbd> <span data-i18n="hintB">移动挡板 · 点击 /</span> <kbd data-i18n="kbdSpace">空格</kbd> <span data-i18n="hintC">发球 ·</span> <kbd>P</kbd> <span data-i18n="hintD">暂停</span></p>
+        <div id="menu-best" class="mini-board">🏆 历史最高：0</div>
+      </div>
+      <div id="screen-pause" class="screen dim hidden">
+        <div class="panel"><h3 data-i18n="paused">⏸ 已暂停</h3><p data-i18n="pressP">按 P 继续</p>
+          <div class="row"><button id="btn-resume" class="btn primary" data-i18n="resume">继续</button><button id="btn-quit" class="btn ghost" data-i18n="quitMenu">回菜单</button></div>
+        </div>
+      </div>
+      <div id="screen-over" class="screen dim hidden">
+        <div class="panel pop">
+          <h3 class="over-title">GAME OVER</h3>
+          <div class="score-row">
+            <div><label data-i18n="scoreLbl">得分</label><b id="final-score">0</b></div>
+            <div class="divider"></div>
+            <div><label data-i18n="stageLbl">到达关卡</label><b id="final-stage">1</b></div>
+          </div>
+          <div class="row"><button id="btn-retry" class="btn primary" data-i18n="retry">🔄 再来一局 (R)</button><button id="btn-menu" class="btn ghost" data-i18n="menu">菜单</button></div>
+        </div>
+      </div>
+      <div id="screen-clear" class="screen dim hidden">
+        <div class="panel pop">
+          <h3 class="clear-title" data-i18n="clearTitle">🎉 全部通关！</h3>
+          <div id="clear-stats" class="stat-list"></div>
+          <div class="row"><button id="btn-again" class="btn primary" data-i18n="again">再玩一次</button><button id="btn-menu2" class="btn ghost" data-i18n="menu">菜单</button></div>
+        </div>
+      </div>
+    </div>
+    <aside class="side">
+      <div class="card"><h4 data-i18n="opTitle">🎮 操作</h4><ul>
+        <li><span data-i18n="op1a">鼠标 /</span> <kbd>←</kbd><kbd>→</kbd> <span data-i18n="op1b">移动挡板</span></li><li><span data-i18n="op2a">点击 /</span> <kbd data-i18n="kbdSpace">空格</kbd> <span data-i18n="op2b">发射粘住的球</span></li><li data-i18n="op3">挡板不同落点反弹角不同</li><li><kbd>P</kbd> <span data-i18n="pauseKw">暂停</span> · <kbd>M</kbd> <span data-i18n="muteKw">静音</span> · <kbd>R</kbd> <span data-i18n="restartKw">重开</span></li></ul></div>
+      <div class="card"><h4 data-i18n="itemTitle">🎁 道具图鉴</h4><ul class="medals">
+        <li data-i18n="item1">↔️ 加长 — 挡板变宽更好接</li><li data-i18n="item2">🔫 激光 — 限时直接开火</li><li data-i18n="item3">🌀 多球 — 一球变三球</li><li data-i18n="item4">💥 穿透 — 一路碾碎砖块</li><li data-i18n="item5">🧲 粘球 — 接住再瞄准</li><li data-i18n="item6">❤️ 生命 +1 · 🐢 减速 — 球慢半拍</li></ul></div>
+      <div class="card diff"><h4 data-i18n="tipTitle">👹 通关秘籍</h4>
+        <p data-i18n="tipBody">33 关尽头有 Boss DOH 坐镇！把球往斜角打，钻到砖块顶上反复弹最划算。</p></div>
+    </aside>
+  </section>
+  <details class="card seo-about"><summary data-i18n="aboutTitle">📖 关于这款游戏</summary><p data-i18n="aboutBody">移动挡板接住小球，打碎所有砖块！ 浏览器打开即玩，支持键盘和触屏，无需下载安装，完全免费。</p></details>
+
+  <footer data-i18n="footer">🕹️ 打开即玩 · 完全免费 · 支持键盘和触屏</footer>
+</main>
+<script src="../assets/amg/i18n.js?v=20260915"></script>
+<script>
+window.GAME_STR = {
+  zh: {
+    title: '打砖块 · 经典益智', subtitle: '经典益智', gameTitle: '打砖块',
+    intro: '移动挡板接住小球，打碎所有砖块！',
+    muteTitle: '声音开 / 关 (M)',
+    start: '🚀 开始游戏',
+    hintA: '鼠标 /', hintB: '移动挡板 · 点击 /', hintC: '发球 ·', hintD: '暂停', kbdSpace: '空格',
+    paused: '⏸ 已暂停', pressP: '按 P 继续', resume: '继续', quitMenu: '回菜单',
+    scoreLbl: '得分', stageLbl: '到达关卡',
+    retry: '🔄 再来一局 (R)', menu: '菜单',
+    clearTitle: '🎉 全部通关！', again: '再玩一次',
+    opTitle: '🎮 操作', op1a: '鼠标 /', op1b: '移动挡板', op2a: '点击 /', op2b: '发射粘住的球', op3: '挡板不同落点反弹角不同',
+    pauseKw: '暂停', muteKw: '静音', restartKw: '重开',
+    itemTitle: '🎁 道具图鉴', item1: '↔️ 加长 — 挡板变宽更好接', item2: '🔫 激光 — 限时直接开火', item3: '🌀 多球 — 一球变三球',
+    item4: '💥 穿透 — 一路碾碎砖块', item5: '🧲 粘球 — 接住再瞄准', item6: '❤️ 生命 +1 · 🐢 减速 — 球慢半拍',
+    tipTitle: '👹 通关秘籍', tipBody: '33 关尽头有 Boss DOH 坐镇！把球往斜角打，钻到砖块顶上反复弹最划算。',
+    footer: '🕹️ 打开即玩 · 完全免费 · 支持键盘和触屏',
+    best: v => '🏆 历史最高：' + v,
+    stageMsg: s => '第 ' + s + ' 关',
+    finalMsg: '最终决战 · DOH',
+    itemWide: '加长！', itemLaser: '激光！', itemMulti: '多球！', itemPierce: '穿透！', itemSticky: '粘球！', itemLife: '+1 命！', itemSlow: '减速！',
+    clearStats: (s, l) => '<div>👹 DOH 已击败！33 关全部通关！</div><div>🏆 总分 <b>' + s + '</b></div><div>❤️ 剩余生命 <b>×' + l + '</b></div>',
+    aboutTitle: '📖 关于这款游戏',
+    aboutBody: '移动挡板接住小球，打碎所有砖块！ 浏览器打开即玩，支持键盘和触屏，无需下载安装，完全免费。',
+  },
+  en: {
+    title: 'Breakout · Classic Arcade', subtitle: 'Classic Arcade', gameTitle: 'Breakout',
+    intro: 'Move the paddle, bounce the ball, smash all the bricks!',
+    muteTitle: 'Sound on/off (M)',
+    start: '🚀 Start Game',
+    hintA: 'Mouse /', hintB: 'to move · click /', hintC: 'to launch ·', hintD: 'to pause', kbdSpace: 'Space',
+    paused: '⏸ Paused', pressP: 'Press P to resume', resume: 'Resume', quitMenu: 'Menu',
+    scoreLbl: 'Score', stageLbl: 'Stage',
+    retry: '🔄 Play Again (R)', menu: 'Menu',
+    clearTitle: '🎉 All Clear!', again: 'Play Again',
+    opTitle: '🎮 Controls', op1a: 'Mouse /', op1b: 'to move the paddle', op2a: 'Click /', op2b: 'to launch the stuck ball', op3: 'Bounce angle depends on hit position',
+    pauseKw: 'pause', muteKw: 'mute', restartKw: 'restart',
+    itemTitle: '🎁 Power-up Guide', item1: '↔️ Extend — wider paddle, easier catches', item2: '🔫 Laser — fire away for a limited time', item3: '🌀 Multi-ball — one ball becomes three',
+    item4: '💥 Pierce — smash straight through', item5: '🧲 Sticky — catch, aim, relaunch', item6: '❤️ +1 Life · 🐢 Slow — ball slows down',
+    tipTitle: '👹 Boss Notes', tipBody: 'Boss DOH waits at stage 33! Aim sharp angles and park the ball on top of the bricks for free hits.',
+    footer: '🕹️ Play instantly · Free · Keyboard & touch friendly',
+    best: v => '🏆 Best: ' + v,
+    stageMsg: s => 'Stage ' + s,
+    finalMsg: 'Final Battle · DOH',
+    itemWide: 'Extend!', itemLaser: 'Laser!', itemMulti: 'Multi-ball!', itemPierce: 'Pierce!', itemSticky: 'Sticky!', itemLife: '+1 Life!', itemSlow: 'Slow!',
+    clearStats: (s, l) => '<div>👹 DOH defeated! All 33 stages cleared!</div><div>🏆 Score <b>' + s + '</b></div><div>❤️ Lives left <b>×' + l + '</b></div>',
+    aboutTitle: '📖 About this game',
+    aboutBody: 'Move the paddle, bounce the ball, smash all the bricks! Play instantly in your browser — keyboard and touch supported, no download needed, completely free.',
+  },
+  ja: {
+    title: 'ブロック崩し · クラシックアーケード', subtitle: 'クラシックアーケード', gameTitle: 'ブロック崩し',
+    intro: 'パドルを動かしてボールを跳ね返し、全部のブロックを壊そう！',
+    muteTitle: 'サウンド ON/OFF (M)',
+    start: '🚀 ゲームスタート',
+    hintA: 'マウス /', hintB: 'で移動 · クリック /', hintC: 'で発射 ·', hintD: 'で一時停止', kbdSpace: 'スペース',
+    paused: '⏸ 一時停止中', pressP: 'Pキーで再開', resume: '再開', quitMenu: 'メニュー',
+    scoreLbl: 'スコア', stageLbl: 'ステージ',
+    retry: '🔄 もう一度 (R)', menu: 'メニュー',
+    clearTitle: '🎉 全クリ！', again: 'もう一度遊ぶ',
+    opTitle: '🎮 操作', op1a: 'マウス /', op1b: 'でパドルを移動', op2a: 'クリック /', op2b: 'で吸着ボールを発射', op3: '当たる位置で反射角が変わる',
+    pauseKw: '一時停止', muteKw: 'ミュート', restartKw: 'リスタート',
+    itemTitle: '🎁 アイテム図鑑', item1: '↔️ 拡張 — パドルが長くなって拾いやすい', item2: '🔫 レーザー — 一定時間そのまま撃てる', item3: '🌀 マルチボール — 1つが3つに',
+    item4: '💥 貫通 — ブロックを突き抜ける', item5: '🧲 吸着 — キャッチして狙い直し', item6: '❤️ ライフ+1 · 🐢 スロー — 球がゆっくり',
+    tipTitle: '👹 攻略メモ', tipBody: '33面の果てにはボスDOHが待つ！斜めに打ってブロックの上で跳ね回らせるのが得策。',
+    footer: '🕹️ すぐ遊べる · 完全無料 · キーボード＆タッチ対応',
+    best: v => '🏆 ベスト：' + v,
+    stageMsg: s => 'ステージ ' + s,
+    finalMsg: '最終決戦 · DOH',
+    itemWide: '拡張！', itemLaser: 'レーザー！', itemMulti: 'マルチボール！', itemPierce: '貫通！', itemSticky: '吸着！', itemLife: '+1 ライフ！', itemSlow: 'スロー！',
+    clearStats: (s, l) => '<div>👹 DOH撃破！全33面クリア！</div><div>🏆 スコア <b>' + s + '</b></div><div>❤️ 残りライフ <b>×' + l + '</b></div>',
+    aboutTitle: '📖 このゲームについて',
+    aboutBody: 'パドルを動かしてボールを跳ね返し、全部のブロックを壊そう！ ブラウザでそのまま遊べます。キーボード・タッチ操作対応、ダウンロード不要・完全無料。',
+  },
+  ko: {
+    title: '벽돌깨기 · 클래식 아케이드', subtitle: '클래식 아케이드', gameTitle: '벽돌깨기',
+    intro: '패들을 움직여 공을 튕겨 모든 벽돌을 깨보세요!',
+    muteTitle: '사운드 켜기/끄기 (M)',
+    start: '🚀 게임 시작',
+    hintA: '마우스 /', hintB: '로 이동 · 클릭 /', hintC: '으로 발사 ·', hintD: '로 일시정지', kbdSpace: '스페이스',
+    paused: '⏸ 일시정지', pressP: 'P를 눌러 계속', resume: '계속', quitMenu: '메뉴',
+    scoreLbl: '점수', stageLbl: '스테이지',
+    retry: '🔄 다시 하기 (R)', menu: '메뉴',
+    clearTitle: '🎉 올클리어!', again: '다시 하기',
+    opTitle: '🎮 조작', op1a: '마우스 /', op1b: '로 패들 이동', op2a: '클릭 /', op2b: '으로 붙은 공 발사', op3: '맞는 위치에 따라 반사각이 달라짐',
+    pauseKw: '일시정지', muteKw: '음소거', restartKw: '다시 시작',
+    itemTitle: '🎁 아이템 도감', item1: '↔️ 확장 — 패들이 길어져 받기 쉬움', item2: '🔫 레이저 — 제한 시간 동안 바로 발사', item3: '🌀 멀티볼 — 하나가 셋으로',
+    item4: '💥 관통 — 벽돌을 그대로 뚫음', item5: '🧲 스티키 — 받은 뒤 조준 발사', item6: '❤️ 목숨 +1 · 🐢 슬로우 — 공이 느려짐',
+    tipTitle: '👹 공략 비결', tipBody: '33스테이지 끝엔 보스 DOH! 날카로운 각도로 쏴서 벽돌 위에서 튕기게 하면 이득.',
+    footer: '🕹️ 바로 플레이 · 완전 무료 · 키보드 & 터치 지원',
+    best: v => '🏆 최고 기록: ' + v,
+    stageMsg: s => '스테이지 ' + s,
+    finalMsg: '최종 결전 · DOH',
+    itemWide: '확장!', itemLaser: '레이저!', itemMulti: '멀티볼!', itemPierce: '관통!', itemSticky: '스티키!', itemLife: '+1 목숨!', itemSlow: '슬로우!',
+    clearStats: (s, l) => '<div>👹 DOH 격파! 33스테이지 올클리어!</div><div>🏆 점수 <b>' + s + '</b></div><div>❤️ 남은 목숨 <b>×' + l + '</b></div>',
+    aboutTitle: '📖 게임 소개',
+    aboutBody: '패들을 움직여 공을 튕겨 모든 벽돌을 깨보세요! 브라우저에서 바로 플레이 — 키보드와 터치 지원, 다운로드 불필요, 완전 무료.',
+  }
+};
+</script>
+<script src="game.js?v=20260906"></script>
+</body>
+</html>

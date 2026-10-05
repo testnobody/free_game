@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="description" content="你和两个电脑对手比赛，谁先出完牌谁赢！">
+<link rel="canonical" href="https://awesome-mini-game.vercel.app/dou-dizhu/">
+<link rel="alternate" hreflang="zh-CN" href="https://awesome-mini-game.vercel.app/dou-dizhu/">
+<link rel="alternate" hreflang="en" href="https://awesome-mini-game.vercel.app/dou-dizhu/?lang=en">
+<link rel="alternate" hreflang="ja" href="https://awesome-mini-game.vercel.app/dou-dizhu/?lang=ja">
+<link rel="alternate" hreflang="ko" href="https://awesome-mini-game.vercel.app/dou-dizhu/?lang=ko">
+<link rel="alternate" hreflang="x-default" href="https://awesome-mini-game.vercel.app/dou-dizhu/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Awesome Mini Game">
+<meta property="og:title" content="斗地主 · 经典桌游">
+<meta property="og:description" content="你和两个电脑对手比赛，谁先出完牌谁赢！">
+<meta property="og:url" content="https://awesome-mini-game.vercel.app/dou-dizhu/">
+<meta property="og:image" content="https://awesome-mini-game.vercel.app/assets/og-cover.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="斗地主 · 经典桌游">
+<meta name="twitter:description" content="你和两个电脑对手比赛，谁先出完牌谁赢！">
+<meta name="twitter:image" content="https://awesome-mini-game.vercel.app/assets/og-cover.png">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "VideoGame",
+  "name": "斗地主 · 经典桌游",
+  "description": "你和两个电脑对手比赛，谁先出完牌谁赢！",
+  "url": "https://awesome-mini-game.vercel.app/dou-dizhu/",
+  "genre": "棋牌桌游",
+  "gamePlatform": "Web Browser",
+  "inLanguage": [
+    "zh-CN",
+    "en",
+    "ja",
+    "ko"
+  ],
+  "isAccessibleForFree": true,
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "CNY"
+  }
+}
+</script>
+<link rel="icon" href="/favicon.svg" />
+<title>斗地主 · 经典桌游</title>
+<link rel="stylesheet" href="styles.css" />
+<link rel="stylesheet" href="../assets/amg/ui.css?v=20260915" />
+<script src="../assets/amg/theme.js"></script>
+</head>
+<body>
+<div class="bg-orbs"><span></span><span></span><span></span></div>
+<main class="page">
+  <header class="brand">
+    <div class="logo">🃏</div>
+    <div>
+      <h1><span data-i18n="gameTitle">斗地主</span> <em data-i18n="subtitle">经典桌游</em></h1>
+      <p data-i18n="intro">你和两个电脑对手比赛，谁先出完牌谁赢！</p>
+    </div>
+    <div class="brand-btns">
+      <button id="btn-mute" class="icon-btn" title="声音开 / 关 (M)">🔊</button>
+    </div>
+  </header>
+  <p class="rotate-tip" aria-hidden="true"></p>
+  <section class="cabinet">
+    <div class="game-frame">
+      <canvas id="game" width="760" height="620"></canvas>
+      <div id="screen-menu" class="screen">
+        <div class="title-badge">DOU DIZHU</div>
+        <h2 class="game-title" data-i18n="gameTitle">斗地主</h2>
+        <div class="board-emoji">🃏🂡🂱🃁🃎</div>
+        <button id="btn-start" class="btn primary" data-i18n="start">🚀 开始对局</button>
+        <p class="hint"><span data-i18n="hintA">点选手牌再点</span> <kbd data-i18n="play">出牌</kbd> <span data-i18n="hintB">· 双击单张可快捷选中</span></p>
+        <div class="mini-board">🏆 <span data-i18n="stWin">胜</span> <b id="st-w">0</b> · <span data-i18n="stLose">负</span> <b id="st-l">0</b> · <span data-i18n="stScore">积分</span> <b id="st-s">0</b></div>
+      </div>
+      <div id="screen-over" class="screen dim hidden">
+        <div class="panel pop">
+          <h3 id="over-title" class="over-title">🎉 农民胜利！</h3>
+          <div id="over-sub" class="over-sub"></div>
+          <div class="row">
+            <button id="btn-retry" class="btn primary" data-i18n="retry">🔄 再来一局 (R)</button>
+            <button id="btn-menu" class="btn ghost" data-i18n="menu">菜单</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <aside class="side">
+      <div class="card"><h4 data-i18n="counterTitle">🧾 记牌器</h4><div id="card-counter" class="counter">开局后显示剩余牌</div></div>
+      <div class="card"><h4 data-i18n="opTitle">🎮 操作</h4><ul>
+        <li data-i18n="op1">点击手牌选中 / 取消，再点出牌按钮</li><li><span data-i18n="op2a">轮到你时可</span> <kbd data-i18n="pass">不出</kbd> <span data-i18n="op2b">（有大过上家的牌除外首手）</span></li><li data-i18n="op3">叫分：叫 1/2/3 分或不叫</li></ul></div>
+      <div class="card"><h4 data-i18n="typeTitle">🃏 牌型</h4><ul class="medals">
+        <li data-i18n="type1">🃏 单张 / 对子 / 三张 / 三带一 / 三带二</li><li data-i18n="type2">🛫 顺子(5+) / 连对(3+) / 飞机(可带)</li><li data-i18n="type3">💣 四带二 / 四带两对 / 炸弹 / 王炸</li></ul></div>
+      <div class="card diff"><h4 data-i18n="tipTitle">💡 出牌心得</h4>
+        <p data-i18n="tipBody">记牌器盯紧王和 2！地主亮出底牌后就想想他多啥，小牌先溜，炸弹留到最后一口闷。</p></div>
+    </aside>
+  </section>
+  <details class="card seo-about"><summary data-i18n="aboutTitle">📖 关于这款游戏</summary><p data-i18n="aboutBody">你和两个电脑对手比赛，谁先出完牌谁赢！ 浏览器打开即玩，支持键盘和触屏，无需下载安装，完全免费。</p></details>
+
+  <footer data-i18n="footer">🕹️ 打开即玩 · 完全免费 · 支持键盘和触屏</footer>
+</main>
+<script src="../assets/amg/i18n.js?v=20260915"></script>
+<script>
+window.GAME_STR = {
+  zh: {
+    title: '斗地主 · 经典桌游', subtitle: '经典桌游', gameTitle: '斗地主',
+    intro: '你和两个电脑对手比赛，谁先出完牌谁赢！',
+    muteTitle: '声音开 / 关 (M)',
+    start: '🚀 开始对局',
+    hintA: '点选手牌再点', hintB: '· 双击单张可快捷选中',
+    stWin: '胜', stLose: '负', stScore: '积分',
+    retry: '🔄 再来一局 (R)', menu: '菜单',
+    counterTitle: '🧾 记牌器', counterEmpty: '开局后显示剩余牌',
+    opTitle: '🎮 操作', op1: '点击手牌选中 / 取消，再点出牌按钮', op2a: '轮到你时可', op2b: '（有大过上家的牌除外首手）', op3: '叫分：叫 1/2/3 分或不叫',
+    typeTitle: '🃏 牌型', type1: '🃏 单张 / 对子 / 三张 / 三带一 / 三带二', type2: '🛫 顺子(5+) / 连对(3+) / 飞机(可带)', type3: '💣 四带二 / 四带两对 / 炸弹 / 王炸',
+    tipTitle: '💡 出牌心得', tipBody: '记牌器盯紧王和 2！地主亮出底牌后就想想他多啥，小牌先溜，炸弹留到最后一口闷。',
+    footer: '🕹️ 打开即玩 · 完全免费 · 支持键盘和触屏',
+    jokerS: '小王', jokerB: '大王', jokerMin: '小', jokerMax: '大',
+    you: '你', aiR: 'AI·右', aiL: 'AI·左',
+    dipai: '底牌', bidding: '叫分中…',
+    lordIs: n => '地主:' + n,
+    topBar: (b, s) => '💣×' + b + '  ' + s,
+    handCount: n => ' 🂠×' + n,
+    pass: '不出', play: '出牌', selectAll: '全选',
+    noBid: '不叫', bidPts: v => v + '分',
+    waitBid: n => '等待 ' + n + ' 叫分…',
+    waitPlay: n => '等待 ' + n + ' 出牌…',
+    pickFirst: '先选牌',
+    noBidRedeal: '无人叫地主，重新发牌',
+    badCombo: '牌型不合法', cantBeat: '管不上上家', badType: '牌型不对',
+    spring: '春天', antiSpring: '反春',
+    winYou: '🎉 你赢了！', winLord: '😈 地主获胜', winFarmers: '🎉 农民胜利！',
+    overSub: (lord, bombs, spring, delta, total) => '地主：' + lord + ' · 炸弹×' + bombs + (spring ? ' · ' + spring : '') + '<br>积分 ' + (delta > 0 ? '+' : '') + delta + '（总 ' + total + '）',
+    tSingle: '单张', tPair: '对子', tTrio: '三张', tTrio1: '三带一', tTrio2: '三带二',
+    tStraight: '顺子', tPairseq: '连对', tPlane: '飞机', tPlane1: '飞机带单', tPlane2: '飞机带对',
+    tFour2: '四带二', tFour22: '四带两对', tBomb: '炸弹！', tRocket: '王炸！',
+    aboutTitle: '📖 关于这款游戏',
+    aboutBody: '你和两个电脑对手比赛，谁先出完牌谁赢！ 浏览器打开即玩，支持键盘和触屏，无需下载安装，完全免费。',
+  },
+  en: {
+    title: 'Dou Dizhu · Classic Card Game', subtitle: 'Classic Card Game', gameTitle: 'Dou Dizhu',
+    intro: 'You vs two AI rivals — first to empty your hand wins!',
+    muteTitle: 'Sound on/off (M)',
+    start: '🚀 Deal Cards',
+    hintA: 'Tap cards to select, then press', hintB: '· double-tap a single to quick-select',
+    stWin: 'W', stLose: 'L', stScore: 'Pts',
+    retry: '🔄 Play Again (R)', menu: 'Menu',
+    counterTitle: '🧾 Card Counter', counterEmpty: 'Remaining cards show after the deal',
+    opTitle: '🎮 Controls', op1: 'Tap hand cards to select / deselect, then press Play', op2a: 'You may', op2b: '(except leading trick when you can beat)', op3: 'Bid 1/2/3 points or pass',
+    typeTitle: '🃏 Hands', type1: '🃏 Single / Pair / Trio / Trio+1 / Trio+2', type2: '🛫 Straight (5+) / Pair sequence (3+) / Plane (with kickers)', type3: '💣 Four+2 / Four+2 pairs / Bomb / Rocket',
+    tipTitle: '💡 Strategy', tipBody: "Watch the counter for jokers and 2s! Once the landlord's kitty is revealed, dump low cards early and save bombs for the finale.",
+    footer: '🕹️ Play instantly · Free · Keyboard & touch friendly',
+    jokerS: 'SJoker', jokerB: 'BJoker', jokerMin: 'S', jokerMax: 'B',
+    you: 'You', aiR: 'AI·R', aiL: 'AI·L',
+    dipai: 'Kitty', bidding: 'Bidding…',
+    lordIs: n => 'Landlord:' + n,
+    topBar: (b, s) => '💣×' + b + '  ' + s,
+    handCount: n => ' 🂠×' + n,
+    pass: 'Pass', play: 'Play', selectAll: 'All',
+    noBid: 'Pass', bidPts: v => v + (v > 1 ? ' pts' : ' pt'),
+    waitBid: n => 'Waiting for ' + n + ' to bid…',
+    waitPlay: n => 'Waiting for ' + n + ' to play…',
+    pickFirst: 'Select cards first',
+    noBidRedeal: 'No one bid — redealing',
+    badCombo: 'Illegal combo', cantBeat: "Can't beat that", badType: 'Wrong combo',
+    spring: 'Spring', antiSpring: 'Anti-Spring',
+    winYou: '🎉 You win!', winLord: '😈 Landlord wins', winFarmers: '🎉 Peasants win!',
+    overSub: (lord, bombs, spring, delta, total) => 'Landlord: ' + lord + ' · Bombs×' + bombs + (spring ? ' · ' + spring : '') + '<br>Points ' + (delta > 0 ? '+' : '') + delta + ' (total ' + total + ')',
+    tSingle: 'Single', tPair: 'Pair', tTrio: 'Trio', tTrio1: 'Trio+1', tTrio2: 'Trio+2',
+    tStraight: 'Straight', tPairseq: 'Pair seq', tPlane: 'Plane', tPlane1: 'Plane+singles', tPlane2: 'Plane+pairs',
+    tFour2: 'Four+2', tFour22: 'Four+2 pairs', tBomb: 'Bomb!', tRocket: 'Rocket!',
+    aboutTitle: '📖 About this game',
+    aboutBody: 'You vs two AI rivals — first to empty your hand wins! Play instantly in your browser — keyboard and touch supported, no download needed, completely free.',
+  },
+  ja: {
+    title: '闘地主 · 定番カードゲーム', subtitle: '定番カードゲーム', gameTitle: '闘地主',
+    intro: 'あなた vs コンピュータ2人、先に手札を出し切ったら勝ち！',
+    muteTitle: 'サウンド ON/OFF (M)',
+    start: '🚀 対局スタート',
+    hintA: '手札をタップで選択、次に', hintB: '· シングルはダブルタップで快速選択',
+    stWin: '勝', stLose: '敗', stScore: '点',
+    retry: '🔄 もう一度 (R)', menu: 'メニュー',
+    counterTitle: '🧾 残り牌カウンター', counterEmpty: '配札後に残り牌を表示',
+    opTitle: '🎮 操作', op1: '手札をタップで選択/解除、次に出すボタン', op2a: '自分の番に', op2b: '（先手を除き場より強い役限定）', op3: 'コール：1/2/3点またはパス',
+    typeTitle: '🃏 役', type1: '🃏 シングル / ペア / トリオ / トリオ+1 / トリオ+2', type2: '🛫 ストレート(5枚+) / 連ペア(3組+) / 飛行機(付き可)', type3: '💣 四枚+2 / 四枚+2ペア / 爆弾 / ロケット',
+    tipTitle: '💡 戦略メモ', tipBody: 'カウンターでジョーカーと2を要チェック！地主の伏せ札が見えたら相手の手を推測、小さい札から流して爆弾は最後に。',
+    footer: '🕹️ すぐ遊べる · 完全無料 · キーボード＆タッチ対応',
+    jokerS: '小王', jokerB: '大王', jokerMin: '小', jokerMax: '大',
+    you: 'あなた', aiR: 'AI·右', aiL: 'AI·左',
+    dipai: '伏せ札', bidding: 'コール中…',
+    lordIs: n => '地主:' + n,
+    topBar: (b, s) => '💣×' + b + '  ' + s,
+    handCount: n => ' 🂠×' + n,
+    pass: 'パス', play: '出す', selectAll: '全選択',
+    noBid: 'パス', bidPts: v => v + '点',
+    waitBid: n => n + ' のコール待ち…',
+    waitPlay: n => n + ' のプレイ待ち…',
+    pickFirst: '先に牌を選んで',
+    noBidRedeal: '誰もコールせず — 再配札',
+    badCombo: '無効な役', cantBeat: '場を上回れない', badType: '役が違う',
+    spring: '春', antiSpring: '反春',
+    winYou: '🎉 あなたの勝ち！', winLord: '😈 地主の勝ち', winFarmers: '🎉 農民の勝ち！',
+    overSub: (lord, bombs, spring, delta, total) => '地主：' + lord + ' · 爆弾×' + bombs + (spring ? ' · ' + spring : '') + '<br>得点 ' + (delta > 0 ? '+' : '') + delta + '（合計 ' + total + '）',
+    tSingle: 'シングル', tPair: 'ペア', tTrio: 'トリオ', tTrio1: 'トリオ+1', tTrio2: 'トリオ+2',
+    tStraight: 'ストレート', tPairseq: '連ペア', tPlane: '飛行機', tPlane1: '飛行機+単', tPlane2: '飛行機+ペア',
+    tFour2: '四枚+2', tFour22: '四枚+2ペア', tBomb: '爆弾！', tRocket: 'ロケット！',
+    aboutTitle: '📖 このゲームについて',
+    aboutBody: 'あなた vs コンピュータ2人、先に手札を出し切ったら勝ち！ ブラウザでそのまま遊べます。キーボード・タッチ操作対応、ダウンロード不要・完全無料。',
+  },
+  ko: {
+    title: '두디주 · 클래식 카드 게임', subtitle: '클래식 카드 게임', gameTitle: '두디주',
+    intro: '당신 vs 컴퓨터 2명, 먼저 패를 다 내면 승리!',
+    muteTitle: '사운드 켜기/끄기 (M)',
+    start: '🚀 대국 시작',
+    hintA: '패를 탭해 선택한 뒤', hintB: '· 싱글은 더블탭으로 빠른 선택',
+    stWin: '승', stLose: '패', stScore: '점',
+    retry: '🔄 다시 하기 (R)', menu: '메뉴',
+    counterTitle: '🧾 남은 패 카운터', counterEmpty: '분배 후 남은 패 표시',
+    opTitle: '🎮 조작', op1: '패를 탭해 선택/해제 후 내기 버튼', op2a: '자기 차례에', op2b: '(선공 제외, 앞 패보다 센 조합만)', op3: '콜: 1/2/3점 또는 패스',
+    typeTitle: '🃏 족보', type1: '🃏 싱글 / 페어 / 트리오 / 트리오+1 / 트리오+2', type2: '🛫 스트레이트(5장+) / 연속 페어(3개+) / 비행기(키커 가능)', type3: '💣 포카드+2 / 포카드+2페어 / 폭탄 / 로켓',
+    tipTitle: '💡 전략 메모', tipBody: '카운터로 조커와 2를 주시! 지주 히든 카드가 공개되면 상대 패를 추측하고, 낮은 패부터 흘리고 폭탄은 마지막에.',
+    footer: '🕹️ 바로 플레이 · 완전 무료 · 키보드 & 터치 지원',
+    jokerS: '소왕', jokerB: '대왕', jokerMin: '소', jokerMax: '대',
+    you: '당신', aiR: 'AI·우', aiL: 'AI·좌',
+    dipai: '히든 카드', bidding: '콜 진행 중…',
+    lordIs: n => '지주:' + n,
+    topBar: (b, s) => '💣×' + b + '  ' + s,
+    handCount: n => ' 🂠×' + n,
+    pass: '패스', play: '내기', selectAll: '전체 선택',
+    noBid: '패스', bidPts: v => v + '점',
+    waitBid: n => n + '의 콜 대기 중…',
+    waitPlay: n => n + '의 플레이 대기 중…',
+    pickFirst: '먼저 패를 선택하세요',
+    noBidRedeal: '아무도 콜하지 않음 — 재배분',
+    badCombo: '잘못된 조합', cantBeat: '앞 패를 이길 수 없음', badType: '족보가 다름',
+    spring: '봄', antiSpring: '반봄',
+    winYou: '🎉 당신의 승리!', winLord: '😈 지주 승리', winFarmers: '🎉 농민 승리!',
+    overSub: (lord, bombs, spring, delta, total) => '지주: ' + lord + ' · 폭탄×' + bombs + (spring ? ' · ' + spring : '') + '<br>점수 ' + (delta > 0 ? '+' : '') + delta + ' (합계 ' + total + ')',
+    tSingle: '싱글', tPair: '페어', tTrio: '트리오', tTrio1: '트리오+1', tTrio2: '트리오+2',
+    tStraight: '스트레이트', tPairseq: '연속 페어', tPlane: '비행기', tPlane1: '비행기+싱글', tPlane2: '비행기+페어',
+    tFour2: '포카드+2', tFour22: '포카드+2페어', tBomb: '폭탄!', tRocket: '로켓!',
+    aboutTitle: '📖 게임 소개',
+    aboutBody: '당신 vs 컴퓨터 2명, 먼저 패를 다 내면 승리! 브라우저에서 바로 플레이 — 키보드와 터치 지원, 다운로드 불필요, 완전 무료.',
+  }
+};
+</script>
+<script src="game.js?v=20260906"></script>
+</body>
+</html>

@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>打地鼠</title>
+<style>
+  :root {
+    --bg: #f5f6f8;
+    --panel: #ffffff;
+    --border: #dfe3e8;
+    --text: #1f2328;
+    --muted: #6b7280;
+    --accent: #3b6ef5;
+    --good: #2e7d32;
+    --danger: #e24b4a;
+    --hole: #6b4a2f;
+    --grass: #7cb342;
+  }
+
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    margin: 0;
+    padding: 24px 16px 40px;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+                 "Hiragino Sans GB", "Microsoft YaHei", Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+  }
+
+  h1 { margin: 0 0 4px; font-size: 30px; letter-spacing: -.02em; }
+  .tip { margin: 0 0 18px; font-size: 13px; color: var(--muted); }
+
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px;
+    box-shadow: 0 1px 2px rgba(16,24,40,.05), 0 4px 12px rgba(16,24,40,.06);
+  }
+
+  .bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+
+  .stat {
+    background: #2f3640;
+    color: #ffd66b;
+    font-family: "SFMono-Regular", Menlo, Consolas, monospace;
+    font-size: 18px;
+    font-weight: 700;
+    padding: 5px 10px;
+    border-radius: 4px;
+    min-width: 58px;
+    text-align: center;
+  }
+
+  button {
+    font-family: inherit;
+    font-size: 13px;
+    color: var(--text);
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 7px 13px;
+    cursor: pointer;
+  }
+  button:hover { border-color: var(--accent); color: var(--accent); }
+  button.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+  /* 3×3 grass field with holes. Both share a wooden mallet cursor (SVG, 48px). */
+  #field {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(3, 110px);
+    gap: 12px;
+    padding: 14px;
+    margin: 0 auto;
+    background: linear-gradient(160deg, #8bc34a, var(--grass));
+    border-radius: 12px;
+    touch-action: manipulation;
+    cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 48 48'><defs><linearGradient id='wh' x1='0' y1='0' x2='0' y2='1'><stop offset='0' stop-color='%23f4dcb2'/><stop offset='.45' stop-color='%23dda86a'/><stop offset='1' stop-color='%23b3803f'/></linearGradient><linearGradient id='wg' x1='0' y1='0' x2='1' y2='0'><stop offset='0' stop-color='%23a5703a'/><stop offset='.45' stop-color='%23dda86a'/><stop offset='1' stop-color='%238d5b2b'/></linearGradient></defs><g transform='rotate(-12 24 24)' stroke='%237a4a21' stroke-width='1.3'><rect x='20' y='24' width='8' height='21' rx='4' fill='url(%23wg)'/><path d='M22 28 L22 41' fill='none' stroke='%23c08b4e' stroke-width='1' opacity='.65'/><rect x='17' y='19' width='14' height='7' rx='2.5' fill='%23c08b4e'/><rect x='4' y='6' width='36' height='17' rx='8' fill='url(%23wh)'/><path d='M9 11 H35' fill='none' stroke='%23ffffff' stroke-width='2.4' opacity='.45' stroke-linecap='round'/><path d='M9 19 H35' fill='none' stroke='%23a5703a' stroke-width='1' opacity='.5' stroke-linecap='round'/></g></svg>") 20 15, pointer;
+  }
+
+  .hole {
+    position: relative;
+    height: 110px;
+    cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 48 48'><defs><linearGradient id='wh' x1='0' y1='0' x2='0' y2='1'><stop offset='0' stop-color='%23f4dcb2'/><stop offset='.45' stop-color='%23dda86a'/><stop offset='1' stop-color='%23b3803f'/></linearGradient><linearGradient id='wg' x1='0' y1='0' x2='1' y2='0'><stop offset='0' stop-color='%23a5703a'/><stop offset='.45' stop-color='%23dda86a'/><stop offset='1' stop-color='%238d5b2b'/></linearGradient></defs><g transform='rotate(-12 24 24)' stroke='%237a4a21' stroke-width='1.3'><rect x='20' y='24' width='8' height='21' rx='4' fill='url(%23wg)'/><path d='M22 28 L22 41' fill='none' stroke='%23c08b4e' stroke-width='1' opacity='.65'/><rect x='17' y='19' width='14' height='7' rx='2.5' fill='%23c08b4e'/><rect x='4' y='6' width='36' height='17' rx='8' fill='url(%23wh)'/><path d='M9 11 H35' fill='none' stroke='%23ffffff' stroke-width='2.4' opacity='.45' stroke-linecap='round'/><path d='M9 19 H35' fill='none' stroke='%23a5703a' stroke-width='1' opacity='.5' stroke-linecap='round'/></g></svg>") 20 15, pointer;
+    overflow: hidden;
+    border-radius: 8px;
+    transition: background-color .12s ease-out;
+  }
+
+  /* Bomb explosion: shock ring, flying sparks and a panel shake */
+  .blast {
+    position: absolute;
+    width: 0;
+    height: 0;
+    pointer-events: none;
+    z-index: 5;
+  }
+  .blast .ring {
+    position: absolute;
+    left: 0; top: 0;
+    width: 22px; height: 22px;
+    margin: -11px 0 0 -11px;
+    border: 3px solid #ffb020;
+    border-radius: 50%;
+    animation: blastRing .45s ease-out forwards;
+  }
+  @keyframes blastRing {
+    from { transform: scale(.3); opacity: .95; }
+    to   { transform: scale(3.6); opacity: 0; }
+  }
+
+  .blast .boomchar {
+    position: absolute;
+    left: 0; top: 0;
+    width: 40px; height: 40px;
+    margin: -20px 0 0 -20px;
+    font-size: 34px;
+    line-height: 40px;
+    text-align: center;
+    animation: blastChar .5s ease-out forwards;
+  }
+  @keyframes blastChar {
+    from { transform: scale(.4); opacity: 1; }
+    to   { transform: scale(1.5); opacity: 0; }
+  }
+
+  .blast .spark {
+    position: absolute;
+    left: 0; top: 0;
+    width: 8px; height: 8px;
+    margin: -4px 0 0 -4px;
+    border-radius: 50%;
+    background: #ff8a3d;
+    animation: blastSpark .5s ease-out forwards;
+  }
+  @keyframes blastSpark {
+    from { transform: translate(0, 0) scale(1); opacity: 1; }
+    to   { transform: translate(var(--tx), var(--ty)) scale(.2); opacity: 0; }
+  }
+
+  .panel.shake { animation: panelShake .32s ease-in-out; }
+  @keyframes panelShake {
+    0%, 100% { transform: none; }
+    20% { transform: translate(-4px, 2px) rotate(-.4deg); }
+    40% { transform: translate(4px, -2px) rotate(.4deg); }
+    60% { transform: translate(-3px, 1px) rotate(-.3deg); }
+    80% { transform: translate(3px, -1px) rotate(.2deg); }
+  }
+
+  /* Red flash when you whack a bomb */
+  .hole.boom { background: rgba(226, 75, 74, .35); }
+
+  .hole::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    bottom: 6px;
+    width: 84px;
+    height: 26px;
+    transform: translateX(-50%);
+    background: var(--hole);
+    border-radius: 50%;
+    box-shadow: inset 0 4px 6px rgba(0,0,0,.45);
+    z-index: 2; /* keep the hole rim above the mole so it reads as a real opening */
+  }
+
+  /* Moles live below the hole by default; .up pops them out, .hit bounces once. */
+  .mole {
+    position: absolute;
+    left: 50%;
+    bottom: -70px;
+    transform: translateX(-50%);
+    width: 76px;
+    height: 76px;
+    font-size: 58px;
+    line-height: 76px;
+    text-align: center;
+    transition: bottom .12s ease-out;
+    pointer-events: none; /* clicks land on the hole */
+    z-index: 1;
+  }
+  .mole.up { bottom: 12px; }
+
+  .mole.hit { animation: pop .18s ease-out; }
+  @keyframes pop {
+    0%   { bottom: 12px; }
+    50%  { bottom: 26px; }
+    100% { bottom: -70px; }
+  }
+
+  #status {
+    margin-top: 14px;
+    font-size: 15px;
+    font-weight: 700;
+    min-height: 22px;
+  }
+  #status.win { color: var(--good); }
+  #status.lose { color: var(--danger); }
+
+  /* End-of-round dialog */
+  .overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(16, 24, 40, .55);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    z-index: 50;
+  }
+  .overlay.show { display: flex; }
+
+  .dialog {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 26px 30px 24px;
+    text-align: center;
+    width: 100%;
+    max-width: 340px;
+    box-shadow: 0 20px 50px rgba(16, 24, 40, .3);
+    animation: dlgIn .2s ease-out;
+  }
+  @keyframes dlgIn {
+    from { transform: translateY(14px) scale(.94); opacity: 0; }
+    to   { transform: none; opacity: 1; }
+  }
+
+  .dlg-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--muted);
+    letter-spacing: .04em;
+  }
+  .dlg-score {
+    font-family: "SFMono-Regular", Menlo, Consolas, monospace;
+    font-size: 62px;
+    font-weight: 800;
+    line-height: 1.15;
+    color: var(--good);
+  }
+  .dlg-score small {
+    font-size: 14px;
+    font-weight: 400;
+    color: var(--muted);
+    margin-left: 6px;
+  }
+  .dlg-rank {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--accent);
+    margin: 2px 0 18px;
+  }
+
+  .dlg-stats { display: flex; gap: 10px; margin-bottom: 22px; }
+  .dlg-stats > div {
+    flex: 1;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 9px 4px;
+  }
+  .dlg-stats b {
+    display: block;
+    font-family: "SFMono-Regular", Menlo, Consolas, monospace;
+    font-size: 20px;
+  }
+  .dlg-stats span { font-size: 11px; color: var(--muted); }
+
+  .dlg-actions { display: flex; gap: 10px; justify-content: center; }
+  button.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  button.primary:hover { color: #fff; opacity: .88; }
+
+  @media (max-width: 560px) {
+    #field { grid-template-columns: repeat(3, 86px); gap: 8px; }
+    .hole { height: 86px; }
+    .hole::after { width: 64px; height: 20px; }
+    .mole {
+      width: 58px; height: 58px;
+      font-size: 42px; line-height: 58px;
+      bottom: -54px;
+    }
+    .mole.up { bottom: 10px; }
+    @keyframes pop {
+      0%   { bottom: 10px; }
+      50%  { bottom: 22px; }
+      100% { bottom: -54px; }
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="lang-switch" data-lang-switch></div>
+
+<h1 data-i18n="title"></h1>
+<p class="tip" data-i18n="tip"></p>
+
+<div class="panel" id="panel">
+  <div class="bar">
+    <button id="lv1" class="active" data-i18n="lv1"></button>
+    <button id="lv2" data-i18n="lv2"></button>
+    <button id="lv3" data-i18n="lv3"></button>
+    <button id="btnNew" data-i18n="restart"></button>
+    <div class="stat" id="score">0</div>
+    <div class="stat" id="time">30</div>
+  </div>
+  <div id="field"></div>
+  <div id="status"></div>
+</div>
+
+<div id="overlay" class="overlay">
+  <div class="dialog">
+    <div class="dlg-title" data-i18n="timeUpTitle"></div>
+    <div class="dlg-score"><span id="dlgScore">0</span><small data-i18n="pointsUnit"></small></div>
+    <div class="dlg-rank" id="dlgRank"></div>
+    <div class="dlg-stats">
+      <div><b id="dlgHits">0</b><span data-i18n="hitsLabel"></span></div>
+      <div><b id="dlgBombs">0</b><span data-i18n="bombsLabel"></span></div>
+      <div><b id="dlgBest">0</b><span data-i18n="bestLabel"></span></div>
+    </div>
+    <div class="dlg-actions">
+      <button id="btnAgain" class="primary" data-i18n="playAgain"></button>
+      <button id="btnClose" data-i18n="closeBtn"></button>
+    </div>
+  </div>
+</div>
+
+<script src="../assets/i18n-lite.js"></script>
+<script>
+(function () {
+  'use strict';
+
+  var T = LiteI18N.create({
+    title:   { en: 'Whack-a-Mole', zh: '打地鼠' },
+    tip: {
+      en: 'Whack moles with the hammer before they hide! Bombs cost you 3 points — 30 seconds per round.',
+      zh: '趁地鼠缩回去之前敲中它们！炸弹扣 3 分，每局 30 秒。'
+    },
+    lv1:     { en: 'Slow', zh: '悠闲' },
+    lv2:     { en: 'Normal', zh: '正常' },
+    lv3:     { en: 'Fast', zh: '疯狂' },
+    restart: { en: 'New game', zh: '重新开始' },
+    clickGo: { en: 'Press "New game" to start', zh: '点「重新开始」开局' },
+    go:      { en: 'Go!', zh: '开始！' },
+    timeUp:  { en: "Time's up! Score: {n}", zh: '时间到！得分：{n}' },
+    timeUpTitle: { en: "TIME'S UP", zh: '时间到' },
+    pointsUnit:  { en: 'pts', zh: '分' },
+    hitsLabel:   { en: 'Moles', zh: '击中地鼠' },
+    bombsLabel:  { en: 'Bombs', zh: '误击炸弹' },
+    bestLabel:   { en: 'Best', zh: '最高分' },
+    playAgain:   { en: 'Play again', zh: '再玩一局' },
+    closeBtn:    { en: 'Close', zh: '关闭' },
+    rankGreat:   { en: 'Mallet master!', zh: '神锤手！' },
+    rankGood:    { en: 'Nice work!', zh: '打得不错！' },
+    rankTry:     { en: 'Keep practicing', zh: '再练练手' }
+  });
+
+  // Difficulty: spawn interval and how long a mole stays up (ms).
+  var LEVELS = {
+    lv1: { every: 950, up: 1100 },
+    lv2: { every: 700, up: 800 },
+    lv3: { every: 480, up: 560 }
+  };
+  var ROUND = 30; // seconds
+
+  var fieldEl = document.getElementById('field');
+  var scoreEl = document.getElementById('score');
+  var timeEl = document.getElementById('time');
+  var statusEl = document.getElementById('status');
+  var overlayEl = document.getElementById('overlay');
+  var panelEl = document.getElementById('panel');
+  var dlgScoreEl = document.getElementById('dlgScore');
+  var dlgRankEl = document.getElementById('dlgRank');
+  var dlgHitsEl = document.getElementById('dlgHits');
+  var dlgBombsEl = document.getElementById('dlgBombs');
+  var dlgBestEl = document.getElementById('dlgBest');
+
+  var BEST_KEY = 'whackmole_best';
+
+  var holes = [];   // { el, moleEl, occupant: null | { kind } }
+  var playing = false;
+  var score, timeLeft, hits, bombs, best;
+  var spawnTimer, tickTimer;
+  var lastResult;
+  var currentLevel = 'lv1';
+
+  /* ---------- best score ---------- */
+
+  function loadBest() {
+    try {
+      var v = parseInt(localStorage.getItem(BEST_KEY), 10);
+      return isNaN(v) ? 0 : v;
+    } catch (e) { return 0; }
+  }
+
+  function saveBest(v) {
+    try { localStorage.setItem(BEST_KEY, String(v)); } catch (e) {}
+  }
+
+  /* ---------- setup ---------- */
+
+  function buildField() {
+    fieldEl.innerHTML = '';
+    holes = [];
+    var frag = document.createDocumentFragment();
+    for (var i = 0; i < 9; i++) {
+      var hole = document.createElement('div');
+      hole.className = 'hole';
+      hole.dataset.idx = String(i);
+
+      var mole = document.createElement('div');
+      mole.className = 'mole';
+      mole.textContent = '🐹';
+      hole.appendChild(mole);
+
+      frag.appendChild(hole);
+      holes.push({ el: hole, moleEl: mole, occupant: null });
+    }
+    fieldEl.appendChild(frag);
+  }
+
+  function newGame() {
+    stopTimers();
+    hideAll();
+
+    score = 0;
+    hits = 0;
+    bombs = 0;
+    timeLeft = ROUND;
+    playing = true;
+    lastResult = null;
+    hideOverlay();
+    scoreEl.textContent = '0';
+    timeEl.textContent = String(ROUND);
+    statusEl.textContent = T.t('go');
+    statusEl.className = 'win';
+
+    var cfg = LEVELS[currentLevel];
+    spawnTimer = setInterval(spawnOne, cfg.every);
+    tickTimer = setInterval(function () {
+      timeLeft--;
+      timeEl.textContent = String(Math.max(0, timeLeft));
+      if (timeLeft <= 0) endRound();
+    }, 1000);
+  }
+
+  function stopTimers() {
+    if (spawnTimer) { clearInterval(spawnTimer); spawnTimer = null; }
+    if (tickTimer) { clearInterval(tickTimer); tickTimer = null; }
+  }
+
+  /* ---------- mole lifecycle ---------- */
+
+  function freeHoles() {
+    return holes.filter(function (h) { return !h.occupant; });
+  }
+
+  function spawnOne() {
+    var free = freeHoles();
+    if (!free.length) return;
+    var hole = free[Math.floor(Math.random() * free.length)];
+
+    // ~15% of spawns are bombs.
+    var kind = Math.random() < 0.15 ? 'bomb' : 'mole';
+    hole.occupant = { kind: kind };
+    hole.moleEl.textContent = kind === 'bomb' ? '💣' : '🐹';
+    hole.moleEl.classList.add('up');
+
+    var cfg = LEVELS[currentLevel];
+    setTimeout(function () {
+      // Recheck: the occupant may have been whacked and replaced meanwhile.
+      if (hole.occupant && hole.occupant.kind === kind) despawn(hole, false);
+    }, cfg.up);
+  }
+
+  function despawn(hole, whacked) {
+    hole.occupant = null;
+    if (whacked) {
+      hole.moleEl.classList.add('hit');
+      var el = hole.moleEl;
+      setTimeout(function () {
+        el.classList.remove('up', 'hit');
+      }, 180);
+    } else {
+      hole.moleEl.classList.remove('up');
+    }
+  }
+
+  function hideAll() {
+    holes.forEach(function (h) {
+      h.occupant = null;
+      h.moleEl.classList.remove('up', 'hit');
+    });
+  }
+
+  /* ---------- bomb explosion ---------- */
+
+  var SPARK_COLORS = ['#ffd54a', '#ff8a3d', '#e24b4a', '#ff6f00'];
+
+  // Burst a shock ring plus a spray of sparks centered on the hole.
+  function explode(hole) {
+    var fr = fieldEl.getBoundingClientRect();
+    var hr = hole.el.getBoundingClientRect();
+
+    var blast = document.createElement('div');
+    blast.className = 'blast';
+    blast.style.left = (hr.left - fr.left + hr.width / 2) + 'px';
+    blast.style.top = (hr.top - fr.top + hr.height / 2) + 'px';
+
+    var ring = document.createElement('div');
+    ring.className = 'ring';
+    blast.appendChild(ring);
+
+    var boom = document.createElement('div');
+    boom.className = 'boomchar';
+    boom.textContent = '💥';
+    blast.appendChild(boom);
+
+    for (var i = 0; i < 12; i++) {
+      var spark = document.createElement('div');
+      spark.className = 'spark';
+      var angle = (Math.PI * 2 / 12) * i + Math.random() * 0.4;
+      var dist = 34 + Math.random() * 30;
+      spark.style.setProperty('--tx', (Math.cos(angle) * dist).toFixed(1) + 'px');
+      spark.style.setProperty('--ty', (Math.sin(angle) * dist).toFixed(1) + 'px');
+      spark.style.background = SPARK_COLORS[i % SPARK_COLORS.length];
+      spark.style.animationDelay = (Math.random() * 0.05).toFixed(2) + 's';
+      blast.appendChild(spark);
+    }
+
+    fieldEl.appendChild(blast);
+    setTimeout(function () { fieldEl.removeChild(blast); }, 700);
+
+    // Panel shake, restarted cleanly if bombs are hit in quick succession.
+    panelEl.classList.remove('shake');
+    void panelEl.offsetWidth;
+    panelEl.classList.add('shake');
+    setTimeout(function () { panelEl.classList.remove('shake'); }, 340);
+  }
+
+  /* ---------- interaction ---------- */
+
+  function whack(i) {
+    if (!playing) return;
+    var hole = holes[i];
+    if (!hole.occupant) return;
+
+    if (hole.occupant.kind === 'bomb') {
+      bombs++;
+      score = Math.max(0, score - 3);
+      // Show the blast on the spot, flash the hole red, then return to idle.
+      hole.el.classList.add('boom');
+      despawn(hole, false);
+      explode(hole);
+      setTimeout(function () {
+        hole.el.classList.remove('boom');
+      }, 300);
+    } else {
+      score++;
+      hits++;
+      despawn(hole, true);
+    }
+    scoreEl.textContent = String(score);
+  }
+
+  /* ---------- end-of-round dialog ---------- */
+
+  function rankKey(s) {
+    if (s >= 25) return 'rankGreat';
+    if (s >= 15) return 'rankGood';
+    return 'rankTry';
+  }
+
+  function showOverlay() {
+    dlgScoreEl.textContent = String(score);
+    dlgHitsEl.textContent = String(hits);
+    dlgBombsEl.textContent = String(bombs);
+    dlgBestEl.textContent = String(best);
+    dlgRankEl.textContent = T.t(rankKey(score));
+    overlayEl.classList.add('show');
+  }
+
+  function hideOverlay() {
+    overlayEl.classList.remove('show');
+  }
+
+  function endRound() {
+    playing = false;
+    stopTimers();
+    hideAll();
+
+    best = Math.max(loadBest(), score);
+    saveBest(best);
+
+    lastResult = { score: score, hits: hits, bombs: bombs, best: best };
+    statusEl.textContent = T.t('timeUp', { n: score });
+    statusEl.className = score >= 20 ? 'win' : 'lose';
+    showOverlay();
+  }
+
+  /* ---------- input wiring ---------- */
+
+  fieldEl.addEventListener('click', function (ev) {
+    var hole = ev.target.closest('.hole');
+    if (!hole) return;
+    whack(parseInt(hole.dataset.idx, 10));
+  });
+
+  document.getElementById('btnNew').addEventListener('click', newGame);
+
+  document.getElementById('btnAgain').addEventListener('click', function () {
+    hideOverlay();
+    newGame();
+  });
+  document.getElementById('btnClose').addEventListener('click', hideOverlay);
+
+  // Clicking the dark backdrop closes the dialog; clicks inside do not.
+  overlayEl.addEventListener('click', function (ev) {
+    if (ev.target === overlayEl) hideOverlay();
+  });
+  document.addEventListener('keydown', function (ev) {
+    if (ev.key !== 'Escape') return;
+    if (overlayEl.classList.contains('show')) hideOverlay();
+  });
+  [['lv1'], ['lv2'], ['lv3']].forEach(function (pair) {
+    var id = pair[0];
+    document.getElementById(id).addEventListener('click', function () {
+      currentLevel = id;
+      ['lv1', 'lv2', 'lv3'].forEach(function (k) {
+        document.getElementById(k).classList.toggle('active', k === id);
+      });
+      newGame();
+    });
+  });
+
+  T.onChange(function () {
+    if (lastResult) {
+      statusEl.textContent = T.t('timeUp', { n: lastResult.score });
+      // Keep the open dialog in sync with the new language.
+      if (overlayEl.classList.contains('show')) showOverlay();
+    } else if (!playing) {
+      statusEl.textContent = T.t('clickGo');
+    }
+  });
+
+  // Initialize the game first, then apply the language (project convention).
+  buildField();
+  best = loadBest();
+  statusEl.textContent = T.t('clickGo');
+  T.start();
+})();
+</script>
+</body>
+</html>

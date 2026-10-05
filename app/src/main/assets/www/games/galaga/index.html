@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="description" content="左右移动射击外星机群，被抓住的战机还能救回来！">
+<link rel="canonical" href="https://awesome-mini-game.vercel.app/galaga/">
+<link rel="alternate" hreflang="zh-CN" href="https://awesome-mini-game.vercel.app/galaga/">
+<link rel="alternate" hreflang="en" href="https://awesome-mini-game.vercel.app/galaga/?lang=en">
+<link rel="alternate" hreflang="ja" href="https://awesome-mini-game.vercel.app/galaga/?lang=ja">
+<link rel="alternate" hreflang="ko" href="https://awesome-mini-game.vercel.app/galaga/?lang=ko">
+<link rel="alternate" hreflang="x-default" href="https://awesome-mini-game.vercel.app/galaga/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Awesome Mini Game">
+<meta property="og:title" content="小蜜蜂 Galaga · 经典空战">
+<meta property="og:description" content="左右移动射击外星机群，被抓住的战机还能救回来！">
+<meta property="og:url" content="https://awesome-mini-game.vercel.app/galaga/">
+<meta property="og:image" content="https://awesome-mini-game.vercel.app/assets/og-cover.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="小蜜蜂 Galaga · 经典空战">
+<meta name="twitter:description" content="左右移动射击外星机群，被抓住的战机还能救回来！">
+<meta name="twitter:image" content="https://awesome-mini-game.vercel.app/assets/og-cover.png">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "VideoGame",
+  "name": "小蜜蜂 Galaga · 经典空战",
+  "description": "左右移动射击外星机群，被抓住的战机还能救回来！",
+  "url": "https://awesome-mini-game.vercel.app/galaga/",
+  "genre": "射击街机",
+  "gamePlatform": "Web Browser",
+  "inLanguage": [
+    "zh-CN",
+    "en",
+    "ja",
+    "ko"
+  ],
+  "isAccessibleForFree": true,
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "CNY"
+  }
+}
+</script>
+<link rel="icon" href="/favicon.svg" />
+<title>小蜜蜂 Galaga · 经典空战</title>
+<link rel="stylesheet" href="styles.css" />
+<link rel="stylesheet" href="../assets/amg/ui.css?v=20260915" />
+<script src="../assets/amg/theme.js"></script>
+</head>
+<body>
+<div class="bg-orbs"><span></span><span></span><span></span></div>
+<main class="page">
+  <header class="brand">
+    <div class="logo">🐝</div>
+    <div>
+      <h1><span data-i18n="gameTitle">小蜜蜂</span> <em data-i18n="galagaSub">GALAGA 空战</em></h1>
+      <p data-i18n="intro">左右移动射击外星机群，被抓住的战机还能救回来！</p>
+    </div>
+    <div class="brand-btns">
+      <button id="btn-mute" class="icon-btn" title="声音开 / 关 (M)">🔊</button>
+    </div>
+  </header>
+  <section class="cabinet">
+    <div class="game-frame">
+      <canvas id="game" width="480" height="640"></canvas>
+      <button id="btn-pause" class="icon-btn pause-btn hidden" title="暂停 (P)">⏸</button>
+
+      <div id="screen-menu" class="screen">
+        <div class="title-badge">GALAGA</div>
+        <h2 class="game-title" data-i18n="gameTitle">小蜜蜂</h2>
+        <div class="hero-row"><span class="hero">🚀</span><span class="hero f">🐝</span><span class="hero">👾</span><span class="hero f">⭐</span></div>
+        <div class="mode-grid">
+          <button class="btn primary" data-mode="solo" data-i18n="solo">🚀 单人出击</button>
+          <button class="btn duel" data-mode="coop" data-i18n="coop">👥 双人协作 (P2: JK)</button>
+        </div>
+        <p class="hint"><span data-i18n="hintPre">按 </span><kbd>Z</kbd> / <kbd data-i18n="keySpace">空格</kbd><span data-i18n="hintPost">开火 · 被抓住的战机可以救回来变双机！</span></p>
+        <div id="menu-best" class="mini-board">🏆 历史最高：0</div>
+      </div>
+
+      <div id="screen-pause" class="screen dim hidden">
+        <div class="panel">
+          <h3 data-i18n="pauseTitle">⏸ 已暂停</h3>
+          <p data-i18n="pauseTip">敌机群正在待命…</p>
+          <div class="row">
+            <button id="btn-resume" class="btn primary" data-i18n="resume">继续</button>
+            <button id="btn-quit" class="btn ghost" data-i18n="quit">回菜单</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="screen-clear" class="screen dim hidden">
+        <div class="panel pop">
+          <h3 class="clear-title"><span data-i18n="clearPre">🏁 第 </span><b id="clear-stage">1</b><span data-i18n="clearPost"> 关通过！</span></h3>
+          <div id="clear-stats" class="stat-list"></div>
+          <div class="row">
+            <button id="btn-next" class="btn primary" data-i18n="nextLabel">下一关 →</button>
+            <button id="btn-replay" class="btn ghost" data-i18n="replay">重玩本关</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="screen-over" class="screen dim hidden">
+        <div class="panel pop">
+          <h3 class="over-title">GAME OVER</h3>
+          <div class="medal">💥</div>
+          <div class="score-row">
+            <div><label data-i18n="scoreNow">本局得分</label><b id="final-score">0</b></div>
+            <div class="divider"></div>
+            <div><label data-i18n="bestRecord">历史最高</label><b id="final-best">0</b><span id="new-record" class="new-record hidden">NEW!</span></div>
+          </div>
+          <div class="row">
+            <button id="btn-retry" class="btn primary" data-i18n="retry">🔄 再来一局 (R)</button>
+            <button id="btn-menu" class="btn ghost" data-i18n="menu">菜单</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="touch" class="touch hidden">
+        <div class="t-left">
+          <button id="t-left" class="t-btn">◀</button>
+          <button id="t-right" class="t-btn">▶</button>
+        </div>
+        <div class="t-right">
+          <button id="t-a" class="t-btn">🔥</button>
+        </div>
+      </div>
+    </div>
+
+    <aside class="side">
+      <div class="card">
+        <h4 data-i18n="opTitle">🎮 操作</h4>
+        <ul>
+          <li><kbd>←</kbd><kbd>→</kbd> / <kbd>A</kbd><kbd>D</kbd><span data-i18n="movePost">移动</span></li>
+          <li><kbd>Z</kbd> / <kbd data-i18n="keySpace">空格</kbd><span data-i18n="firePost"> 开火</span></li>
+          <li><span data-i18n="coopPre">双人：P2 用 </span><kbd>J</kbd><kbd>K</kbd><span data-i18n="coopMid"> 移动 + </span><kbd>L</kbd><span data-i18n="coopPost"> 开火</span></li>
+          <li><kbd>P</kbd><span data-i18n="ctlPause"> 暂停 · </span><kbd>M</kbd><span data-i18n="ctlSound"> 音效 · </span><kbd>R</kbd><span data-i18n="ctlRestart"> 重开</span></li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4 data-i18n="dexTitle">🐝 敌机图鉴</h4>
+        <ul class="medals">
+          <li data-i18n="dexZako">🔵 杂兵蜂 Zako — 50 分，俯冲 100 分</li>
+          <li data-i18n="dexGoei">🔴 红蝶 Goei — 80 分，俯冲 160 分</li>
+          <li data-i18n="dexBoss">🟢 Boss Galaga — 150 分，需 2 发，俯冲 300~400 分</li>
+          <li data-i18n="dexBonus">⚡ 奖励关：全歼 40 只 +10000 分</li>
+        </ul>
+      </div>
+      <div class="card diff">
+        <h4 data-i18n="dualTitle">🚀 双机合体</h4>
+        <p data-i18n="dualText">Boss 会放出牵引光束抓走你的战机！击落抓机的 Boss（俯冲时）即可救回，火力翻倍。双机时被击中只损失一架。</p>
+      </div>
+    </aside>
+  </section>
+  <details class="card seo-about"><summary data-i18n="aboutTitle">📖 关于这款游戏</summary><p data-i18n="aboutBody">左右移动射击外星机群，被抓住的战机还能救回来！ 浏览器打开即玩，支持键盘和触屏，无需下载安装，完全免费。</p></details>
+
+  <footer data-i18n="footer">🕹️ 打开即玩 · 完全免费 · 支持键盘和触屏</footer>
+</main>
+<script src="../assets/amg/i18n.js?v=20260915"></script>
+<script src="../assets/amg/touch.js?v=20260908"></script>
+<script>
+window.GAME_STR = {
+  zh: {
+    title: '小蜜蜂 Galaga · 经典空战', gameTitle: '小蜜蜂', galagaSub: 'GALAGA 空战',
+    intro: '左右移动射击外星机群，被抓住的战机还能救回来！',
+    solo: '🚀 单人出击', coop: '👥 双人协作 (P2: JK)',
+    hintPre: '按 ', keySpace: '空格', hintPost: '开火 · 被抓住的战机可以救回来变双机！',
+    pauseTitle: '⏸ 已暂停', pauseTip: '敌机群正在待命…', resume: '继续', quit: '回菜单',
+    clearPre: '🏁 第 ', clearPost: ' 关通过！', nextLabel: '下一关 →', replay: '重玩本关',
+    scoreNow: '本局得分', bestRecord: '历史最高', retry: '🔄 再来一局 (R)', menu: '菜单',
+    opTitle: '🎮 操作', movePost: '移动', firePost: ' 开火',
+    coopPre: '双人：P2 用 ', coopMid: ' 移动 + ', coopPost: ' 开火',
+    ctlPause: ' 暂停 · ', ctlSound: ' 音效 · ', ctlRestart: ' 重开',
+    dexTitle: '🐝 敌机图鉴',
+    dexZako: '🔵 杂兵蜂 Zako — 50 分，俯冲 100 分',
+    dexGoei: '🔴 红蝶 Goei — 80 分，俯冲 160 分',
+    dexBoss: '🟢 Boss Galaga — 150 分，需 2 发，俯冲 300~400 分',
+    dexBonus: '⚡ 奖励关：全歼 40 只 +10000 分',
+    dualTitle: '🚀 双机合体', dualText: 'Boss 会放出牵引光束抓走你的战机！击落抓机的 Boss（俯冲时）即可救回，火力翻倍。双机时被击中只损失一架。',
+    footer: '🕹️ 打开即玩 · 完全免费 · 支持键盘和触屏',
+    muteTitle: '声音开 / 关 (M)', musicTitle: '音乐开 / 关', pauseBtnTitle: '暂停 (P)',
+    best: v => '🏆 历史最高：' + v,
+    floatSolo: '单机！', floatLife: '🎉 奖励一命！', floatCaptured: '被抓走了！',
+    floatRescue: '救回！双机合体！', floatLost: '战机坠毁…',
+    clearScore: g => '🎯 本关得分 <b>+' + g + '</b>',
+    challLine: (l, b) => '⭐ 奖励关剩余 <b>' + l + '</b> · 全歼奖励 <b>+' + b + '</b>',
+    killsLine: (k, l) => '💥 击坠 <b>' + k + '</b> · 🚀 剩余 <b>×' + l + '</b>',
+    dualKeep: '🚀🚀 双机合体保持！',
+    hudChallLeft: n => '剩余 ' + n, hudFoes: n => '敌机 ' + n,
+    hudDual: '🚀🚀 双机！', hudCaptured: '⚠ 战机被抓！击落俯冲Boss救回！',
+    introChall: '⭐ 奖励关 ⭐', introChallSub: '击落 40 只敌机！全歼 +10000', introGo: '- 出击！ -',
+    aboutTitle: '📖 关于这款游戏',
+    aboutBody: '左右移动射击外星机群，被抓住的战机还能救回来！ 浏览器打开即玩，支持键盘和触屏，无需下载安装，完全免费。',
+  },
+  en: {
+    title: 'Galaga · Classic Space Shooter', gameTitle: 'Galaga', galagaSub: 'GALAGA DOGFIGHT',
+    intro: 'Dodge and blast the alien swarm — rescue captured fighters to fly double!',
+    solo: '🚀 Solo', coop: '👥 Co-op (P2: JK)',
+    hintPre: 'Press ', keySpace: 'Space', hintPost: ' to fire · rescue captured fighters for dual mode!',
+    pauseTitle: '⏸ Paused', pauseTip: 'The swarm is standing by…', resume: 'Resume', quit: 'Menu',
+    clearPre: '🏁 Stage ', clearPost: ' cleared!', nextLabel: 'Next stage →', replay: 'Replay stage',
+    scoreNow: 'Score', bestRecord: 'Best', retry: '🔄 Play again (R)', menu: 'Menu',
+    opTitle: '🎮 Controls', movePost: 'to move', firePost: ' to fire',
+    coopPre: 'Co-op: P2 uses ', coopMid: ' to move + ', coopPost: ' to fire',
+    ctlPause: ' Pause · ', ctlSound: ' Sound · ', ctlRestart: ' Restart',
+    dexTitle: '🐝 Enemy Guide',
+    dexZako: '🔵 Zako — 50 pts, 100 diving',
+    dexGoei: '🔴 Goei (Red Butterfly) — 80 pts, 160 diving',
+    dexBoss: '🟢 Boss Galaga — 150 pts, takes 2 hits, 300–400 diving',
+    dexBonus: '⚡ Bonus stage: wipe out all 40 for +10,000',
+    dualTitle: '🚀 Dual Fighter', dualText: 'Bosses fire tractor beams to capture your fighter! Down the capturing Boss mid-dive to rescue it and double your firepower. While dual, a hit only costs one ship.',
+    footer: '🕹️ Play instantly · Free · Keyboard & touch friendly',
+    muteTitle: 'Sound on/off (M)', musicTitle: 'Music on/off', pauseBtnTitle: 'Pause (P)',
+    best: v => '🏆 Best: ' + v,
+    floatSolo: 'Solo ship!', floatLife: '🎉 Bonus life!', floatCaptured: 'Captured!',
+    floatRescue: 'Rescued! Dual fighter!', floatLost: 'Fighter lost…',
+    clearScore: g => '🎯 Stage score <b>+' + g + '</b>',
+    challLine: (l, b) => '⭐ Bonus: <b>' + l + '</b> left · wipeout bonus <b>+' + b + '</b>',
+    killsLine: (k, l) => '💥 Kills <b>' + k + '</b> · 🚀 Lives <b>×' + l + '</b>',
+    dualKeep: '🚀🚀 Dual fighter kept!',
+    hudChallLeft: n => n + ' left', hudFoes: n => 'Foes ' + n,
+    hudDual: '🚀🚀 DUAL!', hudCaptured: '⚠ Fighter captured! Down the diving Boss to rescue!',
+    introChall: '⭐ BONUS STAGE ⭐', introChallSub: 'Down all 40 fighters! Wipeout +10,000', introGo: '- Scramble! -',
+    aboutTitle: '📖 About this game',
+    aboutBody: 'Dodge and blast the alien swarm — rescue captured fighters to fly double! Play instantly in your browser — keyboard and touch supported, no download needed, completely free.',
+  },
+  ja: {
+    title: 'ギャラガ · クラシックシューティング', gameTitle: 'ギャラガ', galagaSub: 'GALAGA 空戦',
+    intro: '左右に動いてエイリアンを撃とう！捕まった戦闘機は救出できるよ',
+    solo: '🚀 ソロ出撃', coop: '👥 2P協力 (P2: JK)',
+    hintPre: '', keySpace: 'スペース', hintPost: 'で射撃 · 捕獲機を救出してダブル合体！',
+    pauseTitle: '⏸ 一時停止中', pauseTip: '敵の大群が待機中…', resume: '再開', quit: 'メニュー',
+    clearPre: '🏁 ステージ ', clearPost: ' クリア！', nextLabel: '次ステージ →', replay: 'この面を再戦',
+    scoreNow: '今回のスコア', bestRecord: 'ベスト', retry: '🔄 もう一戦 (R)', menu: 'メニュー',
+    opTitle: '🎮 操作', movePost: 'で移動', firePost: ' で射撃',
+    coopPre: '2P協力：P2は ', coopMid: ' で移動 + ', coopPost: ' で射撃',
+    ctlPause: ' 一時停止 · ', ctlSound: ' 効果音 · ', ctlRestart: ' リスタート',
+    dexTitle: '🐝 敵機図鑑',
+    dexZako: '🔵 ザコ — 50点、急降下で100点',
+    dexGoei: '🔴 ゴエイ（赤蝶） — 80点、急降下で160点',
+    dexBoss: '🟢 ボスギャラガ — 150点、2発必要、急降下で300〜400点',
+    dexBonus: '⚡ ボーナス面：40機全滅で+10000点',
+    dualTitle: '🚀 ダブル合体', dualText: 'ボスは牽引光線で自機を捕獲する！急降下中のボスを撃墜すれば救出でき、火力2倍。ダブル時は被弾しても1機のみ損失。',
+    footer: '🕹️ すぐ遊べる · 完全無料 · キーボード＆タッチ対応',
+    muteTitle: 'サウンド 切替 (M)', musicTitle: '音楽 切替', pauseBtnTitle: '一時停止 (P)',
+    best: v => '🏆 ベスト：' + v,
+    floatSolo: '単機！', floatLife: '🎉 1機追加！', floatCaptured: '捕獲された！',
+    floatRescue: '救出！ダブル合体！', floatLost: '機体を失った…',
+    clearScore: g => '🎯 面スコア <b>+' + g + '</b>',
+    challLine: (l, b) => '⭐ ボーナス残り <b>' + l + '</b> · 全滅ボーナス <b>+' + b + '</b>',
+    killsLine: (k, l) => '💥 撃墜 <b>' + k + '</b> · 🚀 残機 <b>×' + l + '</b>',
+    dualKeep: '🚀🚀 ダブル合体を維持！',
+    hudChallLeft: n => '残り ' + n, hudFoes: n => '敵機 ' + n,
+    hudDual: '🚀🚀 ダブル！', hudCaptured: '⚠ 機体を捕獲された！急降下ボスを撃て！',
+    introChall: '⭐ ボーナスステージ ⭐', introChallSub: '敵40機を撃墜せよ！全滅で+10000', introGo: '- 出撃！ -',
+    aboutTitle: '📖 このゲームについて',
+    aboutBody: '左右に動いてエイリアンを撃とう！捕まった戦闘機は救出できるよ ブラウザでそのまま遊べます。キーボード・タッチ操作対応、ダウンロード不要・完全無料。',
+  },
+  ko: {
+    title: '갤러그 · 클래식 슈팅', gameTitle: '갤러그', galagaSub: 'GALAGA 공중전',
+    intro: '좌우로 움직여 외계 함대를 격파! 잡힌 전투기는 구출할 수 있어요',
+    solo: '🚀 솔로 출격', coop: '👥 2인 협동 (P2: JK)',
+    hintPre: '', keySpace: '스페이스', hintPost: '로 발사 · 잡힌 기체를 구출하면 듀얼 합체!',
+    pauseTitle: '⏸ 일시정지', pauseTip: '적 편대가 대기 중…', resume: '계속', quit: '메뉴',
+    clearPre: '🏁 스테이지 ', clearPost: ' 클리어!', nextLabel: '다음 스테이지 →', replay: '이 스테이지 다시 하기',
+    scoreNow: '이번 점수', bestRecord: '최고', retry: '🔄 한 판 더 (R)', menu: '메뉴',
+    opTitle: '🎮 조작', movePost: ' 이동', firePost: ' 발사',
+    coopPre: '협동: P2는 ', coopMid: ' 이동 + ', coopPost: ' 발사',
+    ctlPause: ' 일시정지 · ', ctlSound: ' 효과음 · ', ctlRestart: ' 재시작',
+    dexTitle: '🐝 적기 도감',
+    dexZako: '🔵 자코 — 50점, 급강하 100점',
+    dexGoei: '🔴 고에이(빨간 나비) — 80점, 급강하 160점',
+    dexBoss: '🟢 보스 갤러그 — 150점, 2발 필요, 급강하 300~400점',
+    dexBonus: '⚡ 보너스 스테이지: 40기 전멸 시 +10000점',
+    dualTitle: '🚀 듀얼 합체', dualText: '보스는 견인 빔으로 아군을 포획한다! 급강하 중인 보스를 격추해 구출하면 화력 2배. 듀얼 중 피탄 시 1기만 손실.',
+    footer: '🕹️ 바로 플레이 · 완전 무료 · 키보드 & 터치 지원',
+    muteTitle: '사운드 켜기/끄기 (M)', musicTitle: '음악 켜기/끄기', pauseBtnTitle: '일시정지 (P)',
+    best: v => '🏆 최고: ' + v,
+    floatSolo: '단독기!', floatLife: '🎉 보너스 1기!', floatCaptured: '잡혔다!',
+    floatRescue: '구출! 듀얼 합체!', floatLost: '기체 손실…',
+    clearScore: g => '🎯 스테이지 점수 <b>+' + g + '</b>',
+    challLine: (l, b) => '⭐ 보너스 남음 <b>' + l + '</b> · 전멸 보너스 <b>+' + b + '</b>',
+    killsLine: (k, l) => '💥 격추 <b>' + k + '</b> · 🚀 잔기 <b>×' + l + '</b>',
+    dualKeep: '🚀🚀 듀얼 합체 유지!',
+    hudChallLeft: n => '남음 ' + n, hudFoes: n => '적기 ' + n,
+    hudDual: '🚀🚀 듀얼!', hudCaptured: '⚠ 기체 포획됨! 급강하 보스를 격추하라!',
+    introChall: '⭐ 보너스 스테이지 ⭐', introChallSub: '적 40기를 격추하라! 전멸 +10000', introGo: '- 출격! -',
+    aboutTitle: '📖 게임 소개',
+    aboutBody: '좌우로 움직여 외계 함대를 격파! 잡힌 전투기는 구출할 수 있어요 브라우저에서 바로 플레이 — 키보드와 터치 지원, 다운로드 불필요, 완전 무료.',
+  }
+};
+</script>
+<script src="game.js?v=20260906"></script>
+</body>
+</html>
