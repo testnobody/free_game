@@ -3,7 +3,11 @@ name: Build Debug APK
 on:
   push:
     branches: [main]
+    tags: ["v*"]
   workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
   build:
@@ -29,3 +33,24 @@ jobs:
           name: FreeGame-debug-apk
           path: app/build/outputs/apk/debug/*.apk
           if-no-files-found: error
+
+      - name: Rename APK for release
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: |
+          mv app/build/outputs/apk/debug/app-debug.apk \
+             "app/build/outputs/apk/debug/FreeGame-${{ github.ref_name }}.apk"
+
+      - name: Publish GitHub Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: app/build/outputs/apk/debug/*.apk
+          generate_release_notes: true
+          body: |
+            ## FreeGame ${{ github.ref_name }}
+
+            经典离线单机小游戏合集，纯离线运行，无需联网、无激活码。
+
+            - 35 款 HTML5 经典小游戏（2048、贪吃蛇、坦克大战、俄罗斯方块、扫雷、五子棋、打砖块、连连看、记忆翻牌等）
+            - 游戏来源：[gtdong/litegame](https://github.com/gtdong/litegame) 与 [davidzhanghui/awesome-mini-game](https://github.com/davidzhanghui/awesome-mini-game)，均为 MIT 协议，版权信息见 App 内「关于」页
+            - 下载下方 APK 安装即可（Android 8.0+）
